@@ -3,7 +3,7 @@
 # Contributor: Simon Dreher <code@simon-dreher.de>
 
 pkgname=sonic-pi-git
-pkgver=v2.11.1.r573.g47821c6d7
+pkgver=v3.0.r763.gc09be9b28
 pkgrel=1
 pkgdesc="A music-centric programming environment, originally built for the raspberry pi."
 arch=('i686' 
@@ -19,11 +19,12 @@ depends=('sed'
 	 'qscintilla-qt5'
 	 'jack'
     'aubio'
-    'qwt-qt5-opengl')
+    'qwt')
 makedepends=('cmake'
 	     'git'
 	     'supercollider'
         'qt5-tools'
+        'erlang-nox'
         'boost')
 optdepends=('qjackctl: for graphical jackd spawning/configuration'
 	    'jack2: better jackd if you want to use without gui'
@@ -34,14 +35,16 @@ source=('sonic-pi::git+https://github.com/samaaron/sonic-pi.git'
 	     'launcher.sh'
         'sonic-pi-git.png'
         'sonic-pi-git.desktop'
-        'build-ubuntu-app.patch'
+        'Gemfile'
+        'build-arch-app'
         'SonicPi.patch')
 md5sums=('SKIP'
          '298e2729cda0c33c9cec7f7f721c1bbd'
          'ba86680be610cc3d6f12d4a89b0f434d'
          'fd330b2be9b52e9bee2fb9922141e2ca'
-         '5ed2b42a1a0f6fd4840f1a7154b2d44f'
-         'c1c63041f01c9b1394c3a3273f5ff543')
+         '91cb4d71f0cc83d78fb842c6ba8eccbb'
+         '5478d1467a13bd613adbedc07bee2b72'
+         '870c633688af8e295e8a3725233ec83f')
 
 prepare() {
   msg2 "Hook up qwt to qmake"
@@ -53,14 +56,24 @@ prepare() {
   #Patch build-ubuntu-app script to skip ubuntu-specific (and redundant) options
   msg2 "Patch build-ubuntu-app script for Arch Linux"
   cd $srcdir/sonic-pi/app/gui/qt
-  patch < $srcdir/build-ubuntu-app.patch
-  patch < $srcdir/SonicPi.patch 
+  cp $srcdir/build-arch-app .
+  patch < $srcdir/SonicPi.patch
+  cd $srcdir/sonic-pi/app/server/ruby
+  msg2 "Patching rugged"
+  rm -rf vendor/rugged*
+  cp $srcdir/Gemfile .
+  bundle install --no-cache --path=./vendor --standalone
+  rm Gemfile*
+  rm -rf .bundle
+  mv vendor/ruby/*/gems/rugged-0.27.5 vendor/
+  rm -rf vendor/ruby
+  sed -e s/rugged-0.26.0/rugged-0.27.5/g bin/compile-extensions.rb > bin/compile-extensions.rb
 }
 
 build() {
   #Based on instructions from INSTALL_LINUX.md in upstream sources
   cd $srcdir/sonic-pi/app/gui/qt
-  ./build-ubuntu-app
+  ./build-arch-app
   
   #Cleaning up object files
   cd $srcdir

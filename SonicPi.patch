@@ -4,9 +4,9 @@
  #-------------------------------------------------
  
  TARGET = 'sonic-pi'
--CONFIG += qscintilla2 qwt c++11
-+CONFIG += qscintilla2 qwt c++11
-+INCLUDEPATH += /usr/include/qwt5
+-CONFIG += qscintilla2 qwt c++11 resources_big
++CONFIG += qscintilla2 qwt c++11 resources_big
++INCLUDEPATH += /usr/include/qwt
 +LIBS += -l qwt
  
  QT += core gui concurrent network 
