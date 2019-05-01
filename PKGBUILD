@@ -1,9 +1,10 @@
-# Maintainer: Nigel Michki <nigeil@yahoo.com>
+# Maintainer: Martin Gondermann <magicmonty@pagansoft.de>
+# Based on AUR package by: Nigel Michki <nigeil@yahoo.com>
 # Contributor: Serhii Balbieko <sergey@balbeko.com>
 # Contributor: Simon Dreher <code@simon-dreher.de>
 
 pkgname=sonic-pi-git
-pkgver=v3.0.r890.gd245d93c5
+pkgver=v3.2.r892.bcd7dc3aef
 pkgrel=1
 pkgdesc="A music-centric programming environment, originally built for the raspberry pi."
 arch=('i686'
@@ -17,20 +18,20 @@ depends=('sed'
 	 'libffi'
 	 'lua'
 	 'qscintilla-qt5'
+	 'supercollider'
+   'sc3-plugins'
 	 'jack'
    'aubio'
    'erlang'
    'qwt')
 makedepends=('cmake'
 	     'git'
-	     'supercollider'
        'qt5-tools'
        'boost')
 optdepends=('qjackctl: for graphical jackd spawning/configuration'
 	    'jack2: better jackd if you want to use without gui'
-       'sc3-plugins-git: plugins for supercollider'
 	    'pulseaudio-jack: support for jack2-pulseaudio integration'
-       'cadence: easy jack/pulseaudio crossover')
+       'cadence: easy jack/pulseaudio cros2over')
 source=('sonic-pi::git+https://github.com/samaaron/sonic-pi.git'
 	     'launcher.sh'
         'sonic-pi-git.png'
