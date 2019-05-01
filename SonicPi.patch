@@ -1,13 +1,13 @@
---- src/sonic-pi/app/gui/qt/SonicPi.pro	2016-08-13 10:16:29.000000000 -0400
-+++ SonicPiArch.pro	2016-08-13 10:17:39.257494865 -0400
-@@ -18,7 +18,9 @@
- #-------------------------------------------------
- 
- TARGET = 'sonic-pi'
--CONFIG += qscintilla2 qwt c++11 resources_big
-+CONFIG += qscintilla2 qwt c++11 resources_big
-+INCLUDEPATH += /usr/include/qwt
-+LIBS += -l qwt
- 
- QT += core gui concurrent network 
- greaterThan(QT_MAJOR_VERSION, 4) {
+*** src/sonic-pi/app/gui/qt/SonicPi.pro	2019-05-01 14:32:04.856636261 +0200
+--- SonicPiArch.pro	2019-05-01 14:32:00.666636342 +0200
+***************
+*** 15,20 ****
+--- 15,22 ----
+
+  TARGET = 'sonic-pi'
+  CONFIG += qscintilla2 qwt c++11 resources_big
++ INCLUDEPATH += /usr/include/qwt
++ LIBS += -l qwt
+
+  QT += core gui concurrent network opengl widgets
+

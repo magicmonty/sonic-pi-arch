@@ -3,10 +3,10 @@
 # Contributor: Simon Dreher <code@simon-dreher.de>
 
 pkgname=sonic-pi-git
-pkgver=v3.0.r763.gc09be9b28
+pkgver=v3.0.r890.gd245d93c5
 pkgrel=1
 pkgdesc="A music-centric programming environment, originally built for the raspberry pi."
-arch=('i686' 
+arch=('i686'
       'x86_64')
 url="http://sonic-pi.net/"
 license=('MIT')
@@ -18,14 +18,14 @@ depends=('sed'
 	 'lua'
 	 'qscintilla-qt5'
 	 'jack'
-    'aubio'
-    'qwt')
+   'aubio'
+   'erlang'
+   'qwt')
 makedepends=('cmake'
 	     'git'
 	     'supercollider'
-        'qt5-tools'
-        'erlang-nox'
-        'boost')
+       'qt5-tools'
+       'boost')
 optdepends=('qjackctl: for graphical jackd spawning/configuration'
 	    'jack2: better jackd if you want to use without gui'
        'sc3-plugins-git: plugins for supercollider'
@@ -35,46 +35,40 @@ source=('sonic-pi::git+https://github.com/samaaron/sonic-pi.git'
 	     'launcher.sh'
         'sonic-pi-git.png'
         'sonic-pi-git.desktop'
-        'Gemfile'
-        'build-arch-app'
-        'SonicPi.patch')
+        'build-ubuntu-app.patch'
+        'SonicPi.patch'
+        'sonic-pi-ruby-2.5.patch')
 md5sums=('SKIP'
          '298e2729cda0c33c9cec7f7f721c1bbd'
          'ba86680be610cc3d6f12d4a89b0f434d'
          'fd330b2be9b52e9bee2fb9922141e2ca'
-         '91cb4d71f0cc83d78fb842c6ba8eccbb'
-         '5478d1467a13bd613adbedc07bee2b72'
-         '870c633688af8e295e8a3725233ec83f')
+         '6317fe781fbad36be19946567fc877e8'
+         'cbb985c6be404a9996c1189f6d72a3e3'
+         'fb4e8349532628bc4bf5e5237c0169e4')
 
 prepare() {
   msg2 "Hook up qwt to qmake"
   qmake -set QMAKEFEATURES usr/share/qt4/mkspecs/features
-  
+
   msg2 "Fix wrongly-named (on Arch) QT library"
   find $srcdir/sonic-pi/app/gui/qt -type f -name "*" -readable -exec sed -i 's/lqt5scintilla2/lqscintilla2_qt5/g' {} +
-  
+
   #Patch build-ubuntu-app script to skip ubuntu-specific (and redundant) options
   msg2 "Patch build-ubuntu-app script for Arch Linux"
   cd $srcdir/sonic-pi/app/gui/qt
-  cp $srcdir/build-arch-app .
+  patch < $srcdir/build-ubuntu-app.patch
   patch < $srcdir/SonicPi.patch
-  cd $srcdir/sonic-pi/app/server/ruby
-  msg2 "Patching rugged"
-  rm -rf vendor/rugged*
-  cp $srcdir/Gemfile .
-  bundle install --no-cache --path=./vendor --standalone
-  rm Gemfile*
-  rm -rf .bundle
-  mv vendor/ruby/*/gems/rugged-0.27.5 vendor/
-  rm -rf vendor/ruby
-  sed -e s/rugged-0.26.0/rugged-0.27.5/g bin/compile-extensions.rb > bin/compile-extensions.rb
+  cp $srcdir/sonic-pi-ruby-2.5.patch $srcdir/sonic-pi
+  cd $srcdir/sonic-pi
+  patch -p 1 < ./sonic-pi-ruby-2.5.patch
+  rm $srcdir/sonic-pi-ruby-2.5.patch
 }
 
 build() {
   #Based on instructions from INSTALL_LINUX.md in upstream sources
   cd $srcdir/sonic-pi/app/gui/qt
-  ./build-arch-app
-  
+  ./build-ubuntu-app
+
   #Cleaning up object files
   cd $srcdir
   find . -type f -name "*.o" -exec rm {} +
@@ -89,21 +83,57 @@ pkgver() {
 
 package() {
   #Install sources to /opt/
-  mkdir $pkgdir/opt/
-  mkdir $pkgdir/opt/sonic-pi
+  mkdir -p $pkgdir/opt/sonic-pi
   cp -R $srcdir/sonic-pi/* $pkgdir/opt/sonic-pi/ > /dev/null
   ln -s -r $pkgdir/opt/sonic-pi/app/server $pkgdir/opt/sonic-pi/server
-  
+
   #Add a launcher script to /usr/bin
-  mkdir $pkgdir/usr
-  mkdir $pkgdir/usr/bin
+  mkdir -p $pkgdir/usr/bin
   install -Dm644 "$srcdir/launcher.sh" "$pkgdir/usr/bin/sonic-pi"
   chmod +x $pkgdir/usr/bin/sonic-pi
-  
+
   #Add a desktop entry
-  mkdir $pkgdir/usr/share
-  mkdir $pkgdir/usr/share/applications
+  mkdir -p $pkgdir/usr/share/applications
   install -Dm644 "$pkgname.desktop" "$pkgdir/usr/share/applications/$pkgname.desktop"
-  mkdir $pkgdir/usr/share/pixmaps
+  mkdir -p $pkgdir/usr/share/pixmaps
   install -Dm644 "sonic-pi-git.png" "$pkgdir/usr/share/pixmaps/$pkgname.png"
+
+  cd $srcdir/sonic-pi/app/gui/qt
+  cat prune.rb | sed 's/rehearse = true/rehearse = false/' > prune_hot.rb
+  chmod 0755 prune_hot.rb
+  ./prune_hot.rb $pkgdir/opt/sonic-pi/app/server/ruby/vendor
+
+  rm $pkgdir/opt/sonic-pi/CORETEAM.html
+
+  cd $pkgdir
+  find $pkgdir -type f -iname '*.cpp' -delete
+  find $pkgdir -type f -iname '*.erl' -delete
+  find $pkgdir -type f -iname '*.hpp' -delete
+  find $pkgdir -type f -iname '*.c' -delete
+  find $pkgdir -type f -iname '*.h' -delete
+  find $pkgdir -type f -iname '*.hh' -delete
+  find $pkgdir -type f -iname '*.o' -delete
+  find $pkgdir -type f -iname '*.patch' -delete
+  find $pkgdir -type f -iname 'build-*' -delete
+  find $pkgdir -type f -iname '*.pro' -delete
+  find $pkgdir -type f -iname '*.qrc' -delete
+  find $pkgdir -type f -iname '*.bat' -delete
+  find $pkgdir -type f -iname '*.tmpl' -delete
+  find $pkgdir -type f -iname 'Makefile' -delete
+  find $pkgdir -type f -iname 'Rakefile' -delete
+  find $pkgdir -type f -iname 'Brewfile*' -delete
+  find $pkgdir -type d -name 'test' -exec rm -rf {} +
+  find $pkgdir -type d -name 'tests' -exec rm -rf {} +
+  find $pkgdir -type f -name 'INSTALL-*.md' -delete
+
+  mv $pkgdir/opt/sonic-pi/app/server/native/linux/* $pkgdir/opt/sonic-pi/app/server/native
+  rm -rf $pkgdir/opt/sonic-pi/app/server/native/linux
+  rm -rf $pkgdir/opt/sonic-pi/app/server/ruby/test
+  rm -rf $pkgdir/opt/sonic-pi/app/gui/qt/platform
+  rm -rf $pkgdir/opt/sonic-pi/app/gui/qt/wix
+  rm $pkgdir/opt/sonic-pi/app/gui/qt/create-pdf
+  rm $pkgdir/opt/sonic-pi/app/gui/qt/mac-*
+  rm $pkgdir/opt/sonic-pi/app/gui/qt/prune*.rb
+  rm $pkgdir/opt/sonic-pi/app/gui/qt/rp-*
+  rm $pkgdir/opt/sonic-pi/app/gui/qt/SonicPi.rc
 }
