@@ -38,14 +38,20 @@ source=('sonic-pi::git+https://github.com/samaaron/sonic-pi.git'
         'sonic-pi-git.desktop'
         'build-ubuntu-app.patch'
         'SonicPi.patch'
-        'sonic-pi-ruby-2.5.patch')
+        'sonic-pi-ruby-2.5.patch'
+        'lambdaphonic.patch'
+        'Monoid-Regular.ttf'
+        'Monoid-Italic.ttf')
 md5sums=('SKIP'
          '298e2729cda0c33c9cec7f7f721c1bbd'
          'ba86680be610cc3d6f12d4a89b0f434d'
          'fd330b2be9b52e9bee2fb9922141e2ca'
          '6317fe781fbad36be19946567fc877e8'
          '18ae5d7db132a68387aba07dcdd10a33'
-         'fb4e8349532628bc4bf5e5237c0169e4')
+         'fb4e8349532628bc4bf5e5237c0169e4'
+         '9a0b200541a209f8d4750e4ab3b58b5a'
+         '7e9c019819d3c84efb61a3abded177aa'
+         '3f772e57770d2d3a6850af070a37b194')
 
 prepare() {
   msg2 "Hook up qwt to qmake"
@@ -60,9 +66,12 @@ prepare() {
   patch < $srcdir/build-ubuntu-app.patch
   patch < $srcdir/SonicPi.patch
   cp $srcdir/sonic-pi-ruby-2.5.patch $srcdir/sonic-pi
+  cp $srcdir/lambdaphonic.patch $srcdir/sonic-pi
   cd $srcdir/sonic-pi
   patch -p 1 < ./sonic-pi-ruby-2.5.patch
-  rm $srcdir/sonic-pi/sonic-pi-ruby-2.5.patch
+  patch -p 1 < ./lambdaphonic.patch
+  rm *.patch
+  cp $srcdir/*.ttf $srcdir/sonic-pi/app/gui/qt/fonts/
 }
 
 build() {
