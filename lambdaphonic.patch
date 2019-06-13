@@ -76,10 +76,11 @@ index 46a2c66eb..b1e07374b 100644
 
    appStyling
      .replace("windowColor", windowColor)
-@@ -2834,8 +2833,8 @@ void MainWindow::updateAction(QAction *action, QShortcut *sc, QString tooltip,
+@@ -2833,8 +2833,8 @@ void MainWindow::updateAction(QAction *action, QShortcut *sc, QString tooltip,
 
  void MainWindow::createShortcuts()
  {
+   std::cout << "[GUI] - creating shortcuts" << std::endl;
 -  new QShortcut(shiftMetaKey('['), this, SLOT(tabPrev()));
 -  new QShortcut(shiftMetaKey(']'), this, SLOT(tabNext()));
 +  new QShortcut(metaKey('<'), this, SLOT(tabPrev()));
@@ -111,8 +112,8 @@ index 46a2c66eb..b1e07374b 100644
  void MainWindow::addCuePath(QString path, QString val)
  {
    Q_UNUSED(val);
--  
-+  
+-
++
    if (!path.startsWith(":"))  {
        path =  "\"" + path + "\"";
    }
