@@ -135,12 +135,19 @@ package() {
   find $pkgdir -type d -name 'test' -exec rm -rf {} +
   find $pkgdir -type d -name 'tests' -exec rm -rf {} +
   find $pkgdir -type f -name 'INSTALL-*.md' -delete
+  find $pkgdir -type f -name '*.orig' -delete
+  find $pkgdir -type f -name '.gitkeep' -delete
 
   mv $pkgdir/opt/sonic-pi/app/server/native/linux/* $pkgdir/opt/sonic-pi/app/server/native
   rm -rf $pkgdir/opt/sonic-pi/app/server/native/linux
   rm -rf $pkgdir/opt/sonic-pi/app/server/ruby/test
   rm -rf $pkgdir/opt/sonic-pi/app/gui/qt/platform
   rm -rf $pkgdir/opt/sonic-pi/app/gui/qt/wix
+  rm -rf $pkgdir/opt/sonic-pi/app/gui/qt/image_source
+  rm -rf $pkgdir/opt/sonic-pi/etc/synthdefs/graphviz
+  rm -rf $pkgdir/opt/sonic-pi/etc/wavetables
+
+  rm $pkgdir/opt/sonic-pi/app/gui/qt/.qmake.stash
   rm $pkgdir/opt/sonic-pi/app/gui/qt/create-pdf
   rm $pkgdir/opt/sonic-pi/app/gui/qt/mac-*
   rm $pkgdir/opt/sonic-pi/app/gui/qt/prune*.rb
