@@ -49,7 +49,7 @@ md5sums=('SKIP'
          '6317fe781fbad36be19946567fc877e8'
          '18ae5d7db132a68387aba07dcdd10a33'
          'fb4e8349532628bc4bf5e5237c0169e4'
-         'f7b0c5080e41bbdf7bea207f4ee13ff8'
+         '367f8a8f44e391ce631bad4d3468df5f'
          '7e9c019819d3c84efb61a3abded177aa'
          '3f772e57770d2d3a6850af070a37b194')
 
@@ -57,20 +57,17 @@ prepare() {
   msg2 "Hook up qwt to qmake"
   qmake -set QMAKEFEATURES usr/share/qt4/mkspecs/features
 
-  #msg2 "Fix wrongly-named (on Arch) QT library"
-  find $srcdir/sonic-pi/app/gui/qt -type f -name "*" -readable -exec sed -i 's/lqt5scintilla2/lqscintilla2_qt5/g' {} +
+  #  msg2 "Fix wrongly-named (on Arch) QT library"
+  # find $srcdir/sonic-pi/app/gui/qt -type f -name "*" -readable -exec sed -i 's/lqt5scintilla2/lqscintilla2_qt5/g' {} +
 
   #Patch build-ubuntu-app script to skip ubuntu-specific (and redundant) options
   msg2 "Patch build-ubuntu-app script for Arch Linux"
   cd $srcdir/sonic-pi/app/gui/qt
   patch < $srcdir/build-ubuntu-app.patch
   patch < $srcdir/SonicPi.patch
-  cp $srcdir/sonic-pi-ruby-2.5.patch $srcdir/sonic-pi
-  cp $srcdir/lambdaphonic.patch $srcdir/sonic-pi
   cd $srcdir/sonic-pi
-  patch -p 1 < ./sonic-pi-ruby-2.5.patch
-  patch -p 1 < ./lambdaphonic.patch
-  rm *.patch
+  patch -p 1 < ../sonic-pi-ruby-2.5.patch
+  patch -p 1 < ../lambdaphonic.patch
   cp $srcdir/*.ttf $srcdir/sonic-pi/app/gui/qt/fonts/
 }
 

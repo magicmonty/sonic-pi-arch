@@ -1,141 +1,516 @@
 diff --git a/app/gui/qt/SonicPi.qrc b/app/gui/qt/SonicPi.qrc
-index 40f1883de..39516d081 100644
+index 2bebd7f25..8d51c40a5 100644
 --- a/app/gui/qt/SonicPi.qrc
 +++ b/app/gui/qt/SonicPi.qrc
-@@ -172,5 +172,7 @@
-
-         <file>fonts/Hack-Regular.ttf</file>
-         <file>fonts/Hack-Italic.ttf</file>
+@@ -173,7 +173,7 @@
+ 
+ 
+ 
+-        <file>fonts/Hack-Regular.ttf</file>
+-        <file>fonts/Hack-Italic.ttf</file>
 +        <file>fonts/Monoid-Regular.ttf</file>
 +        <file>fonts/Monoid-Italic.ttf</file>
      </qresource>
  </RCC>
 diff --git a/app/gui/qt/main.cpp b/app/gui/qt/main.cpp
-index a87153609..4cc25f128 100644
+index 728218461..4616755d2 100644
 --- a/app/gui/qt/main.cpp
 +++ b/app/gui/qt/main.cpp
-@@ -30,6 +30,8 @@ int main(int argc, char *argv[])
-
+@@ -30,8 +30,8 @@ int main(int argc, char *argv[])
+ 
    QApplication app(argc, argv);
-
+ 
+-  QFontDatabase::addApplicationFont(":/fonts/Hack-Regular.ttf");
+-  QFontDatabase::addApplicationFont(":/fonts/Hack-Italic.ttf");
 +  QFontDatabase::addApplicationFont(":/fonts/Monoid-Regular.ttf");
 +  QFontDatabase::addApplicationFont(":/fonts/Monoid-Italic.ttf");
-   QFontDatabase::addApplicationFont(":/fonts/Hack-Regular.ttf");
-   QFontDatabase::addApplicationFont(":/fonts/Hack-Italic.ttf");
-
+ 
+   qRegisterMetaType<SonicPiLog::MultiMessage>("SonicPiLog::MultiMessage");
+ 
 diff --git a/app/gui/qt/mainwindow.cpp b/app/gui/qt/mainwindow.cpp
-index 46a2c66eb..b1e07374b 100644
+index d0273327e..5443c3c21 100644
 --- a/app/gui/qt/mainwindow.cpp
 +++ b/app/gui/qt/mainwindow.cpp
-@@ -607,9 +607,9 @@ void MainWindow::setupWindowStructure() {
-   incomingPane->setReadOnly(true);
-   errorPane->setReadOnly(true);
-   outputPane->setLineWrapMode(QPlainTextEdit::NoWrap);
--  outputPane->setFontFamily("Hack");
-+  outputPane->setFontFamily("Monoid HalfTight");
-   incomingPane->setLineWrapMode(QPlainTextEdit::NoWrap);
--  incomingPane->setFontFamily("Hack");
-+  incomingPane->setFontFamily("Monoid HalfTight");
-
-   if(!theme->font("LogFace").isEmpty()){
-       outputPane->setFontFamily(theme->font("LogFace"));
-@@ -915,7 +915,6 @@ void MainWindow::completeSnippetOrIndentCurrentLineOrSelection(SonicPiScintilla*
-     finish_line = point_line;
-   }
-
+@@ -144,7 +144,7 @@ MainWindow::MainWindow(QApplication &app, bool i18n, QSplashScreen* splash)
+     std::cout << "[GUI] - " << guiID.toStdString() << std::endl;
+ 
+     setupTheme();
+-    
++
+     lexer = new SonicPiLexer(theme);
+     QPalette p = theme->createPalette();
+     QApplication::setPalette(p);
+@@ -524,7 +524,7 @@ void MainWindow::setupWindowStructure() {
+     connect(settingsWidget, SIGNAL(checkUpdatesChanged()), this, SLOT(update_check_updates()));
+     connect(settingsWidget, SIGNAL(forceCheckUpdates()), this, SLOT(check_for_updates_now()));
+ 
+-    connect(this, SIGNAL(settingsChanged()), settingsWidget, SLOT(settingsChanged()));  
++    connect(this, SIGNAL(settingsChanged()), settingsWidget, SLOT(settingsChanged()));
+ 
+     scopeInterface = new Scope(scsynth_port);
+     scopeInterface->pause();
+@@ -690,9 +690,9 @@ void MainWindow::setupWindowStructure() {
+     incomingPane->setReadOnly(true);
+     errorPane->setReadOnly(true);
+     outputPane->setLineWrapMode(QPlainTextEdit::NoWrap);
+-    outputPane->setFontFamily("Hack");
++    outputPane->setFontFamily("Monoid HalfTight");
+     incomingPane->setLineWrapMode(QPlainTextEdit::NoWrap);
+-    incomingPane->setFontFamily("Hack");
++    incomingPane->setFontFamily("Monoid HalfTight");
+ 
+     if(!theme->font("LogFace").isEmpty()){
+         outputPane->setFontFamily(theme->font("LogFace"));
+@@ -1669,10 +1669,9 @@ void MainWindow::about() {
+     // Qt::Tool windows get closed automatically when app loses focus
+     if(infoWidg->isVisible()) {
+         infoWidg->hide();
 -
-   std::string code = ws->text().toStdString();
-
-   Message msg("/buffer-section-complete-snippet-or-indent-selection");
-@@ -1261,8 +1260,8 @@ void MainWindow::initPrefsWindow() {
-
-   midi_in_ports_label = new QLabel;
-   midi_out_ports_label = new QLabel;
--  midi_in_ports_label->setFont(QFont("Hack"));
--  midi_out_ports_label->setFont(QFont("Hack"));
-+  midi_in_ports_label->setFont(QFont("Monoid HalfTight"));
-+  midi_out_ports_label->setFont(QFont("Monoid HalfTight"));
-   midi_in_ports_label->setAccessibleName("midi-in-ports-label");
-   midi_out_ports_label->setAccessibleName("midi-out-ports-label");
-   midi_in_ports_label->setText(tr("No connected input devices"));
-@@ -1443,7 +1442,7 @@ void MainWindow::initPrefsWindow() {
-   colourModeButtonGroup->addButton(darkProModeCheck, 3);
-   colourModeButtonGroup->addButton(highContrastModeCheck, 4);
-
--  lightModeCheck->setChecked(true);
-+  darkProModeCheck->setChecked(true);
-   connect(show_line_numbers, SIGNAL(clicked()), this, SLOT(changeShowLineNumbers()));
-   connect(show_log, SIGNAL(clicked()), this, SLOT(updateLogVisibility()));
-   connect(show_incoming_osc_log, SIGNAL(clicked()), this, SLOT(updateIncomingOscLogVisibility()));
-@@ -2581,7 +2580,7 @@ void MainWindow::updateColourTheme(){
-
-   QString appStyling = readFile(qt_app_theme_path);
-
--  appStyling.replace("fixedWidthFont", "\"Hack\"");
-+  appStyling.replace("fixedWidthFont", "\"Monoid HalfTight\"");
-
-   appStyling
-     .replace("windowColor", windowColor)
-@@ -2833,8 +2833,8 @@ void MainWindow::updateAction(QAction *action, QShortcut *sc, QString tooltip,
-
+     } else {
+-        infoWidg->raise();
+-        infoWidg->show();
++        // infoWidg->raise();
++        // infoWidg->show();
+     }
+     infoAct->setIcon( theme->getInfoIcon( infoWidg->isVisible()));
+ }
+@@ -1762,15 +1761,15 @@ void MainWindow::toggleScopeAxes()
+ }
+ 
+ void MainWindow::cycleThemes() {
+-    if ( piSettings->theme == SonicPiTheme::LightMode ) { 
++    if ( piSettings->theme == SonicPiTheme::LightMode ) {
+         piSettings->theme = SonicPiTheme::DarkMode;
+-    } else if ( piSettings->theme == SonicPiTheme::DarkMode ) { 
++    } else if ( piSettings->theme == SonicPiTheme::DarkMode ) {
+         piSettings->theme = SonicPiTheme::LightProMode;
+-    } else if ( piSettings->theme == SonicPiTheme::LightProMode ) { 
++    } else if ( piSettings->theme == SonicPiTheme::LightProMode ) {
+         piSettings->theme = SonicPiTheme::DarkProMode;
+-    } else if ( piSettings->theme == SonicPiTheme::DarkProMode ) { 
++    } else if ( piSettings->theme == SonicPiTheme::DarkProMode ) {
+         piSettings->theme = SonicPiTheme::HighContrastMode;
+-    } else if ( piSettings->theme == SonicPiTheme::HighContrastMode ) { 
++    } else if ( piSettings->theme == SonicPiTheme::HighContrastMode ) {
+         piSettings->theme = SonicPiTheme::LightMode;
+     }
+     updateColourTheme();
+@@ -2018,8 +2017,8 @@ void MainWindow::updateAction(QAction *action, QShortcut *sc, QString tooltip,
  void MainWindow::createShortcuts()
  {
-   std::cout << "[GUI] - creating shortcuts" << std::endl;
--  new QShortcut(shiftMetaKey('['), this, SLOT(tabPrev()));
--  new QShortcut(shiftMetaKey(']'), this, SLOT(tabNext()));
-+  new QShortcut(metaKey('<'), this, SLOT(tabPrev()));
-+  new QShortcut(shiftMetaKey('<'), this, SLOT(tabNext()));
-   new QShortcut(QKeySequence("F8"), this, SLOT(reloadServerCode()));
-   new QShortcut(QKeySequence("F9"), this, SLOT(toggleButtonVisibility()));
-   new QShortcut(shiftMetaKey('B'), this, SLOT(toggleButtonVisibility()));
-@@ -2845,6 +2844,19 @@ void MainWindow::createShortcuts()
-   new QShortcut(QKeySequence("F11"), this, SLOT(toggleLogVisibility()));
-   new QShortcut(shiftMetaKey('L'), this, SLOT(toggleLogVisibility()));
-   new QShortcut(QKeySequence("F12"),this, SLOT(toggleScopePaused()));
+     std::cout << "[GUI] - creating shortcuts" << std::endl;
+-    new QShortcut(shiftMetaKey('['), this, SLOT(tabPrev()));
+-    new QShortcut(shiftMetaKey(']'), this, SLOT(tabNext()));
++    new QShortcut(metaKey('<'), this, SLOT(tabPrev()));
++    new QShortcut(shiftMetaKey('<'), this, SLOT(tabNext()));
+     new QShortcut(QKeySequence("F8"), this, SLOT(reloadServerCode()));
+     new QShortcut(QKeySequence("F9"), this, SLOT(toggleButtonVisibility()));
+     new QShortcut(shiftMetaKey('B'), this, SLOT(toggleButtonVisibility()));
+@@ -2029,6 +2028,17 @@ void MainWindow::createShortcuts()
+     new QShortcut(QKeySequence("F11"), this, SLOT(toggleLogVisibility()));
+     new QShortcut(shiftMetaKey('L'), this, SLOT(toggleLogVisibility()));
+     new QShortcut(QKeySequence("F12"),this, SLOT(toggleScopePaused()));
 +
-+  new QShortcut(shiftMetaKey('1'), this, SLOT(changeTab(0)));
-+  new QShortcut(shiftMetaKey('2'), this, SLOT(changeTab(1)));
-+  new QShortcut(shiftMetaKey('3'), this, SLOT(changeTab(2)));
-+  new QShortcut(shiftMetaKey('4'), this, SLOT(changeTab(3)));
-+  new QShortcut(shiftMetaKey('5'), this, SLOT(changeTab(4)));
-+  new QShortcut(shiftMetaKey('6'), this, SLOT(changeTab(5)));
-+  new QShortcut(shiftMetaKey('7'), this, SLOT(changeTab(6)));
-+  new QShortcut(shiftMetaKey('8'), this, SLOT(changeTab(7)));
-+  new QShortcut(shiftMetaKey('9'), this, SLOT(changeTab(8)));
-+  new QShortcut(shiftMetaKey('0'), this, SLOT(changeTab(9)));
-+
-+  new QShortcut(shiftMetaKey('q'), this, SLOT(close()));
++    new QShortcut(shiftMetaKey('1'), this, SLOT(changeTab(0)));
++    new QShortcut(shiftMetaKey('2'), this, SLOT(changeTab(1)));
++    new QShortcut(shiftMetaKey('3'), this, SLOT(changeTab(2)));
++    new QShortcut(shiftMetaKey('4'), this, SLOT(changeTab(3)));
++    new QShortcut(shiftMetaKey('5'), this, SLOT(changeTab(4)));
++    new QShortcut(shiftMetaKey('6'), this, SLOT(changeTab(5)));
++    new QShortcut(shiftMetaKey('7'), this, SLOT(changeTab(6)));
++    new QShortcut(shiftMetaKey('8'), this, SLOT(changeTab(7)));
++    new QShortcut(shiftMetaKey('9'), this, SLOT(changeTab(8)));
++    new QShortcut(shiftMetaKey('0'), this, SLOT(changeTab(9)));
  }
-
+ 
  void  MainWindow::createToolBar()
-@@ -3516,7 +3528,7 @@ void MainWindow::updateVersionNumber(QString v, int v_num,QString latest_v, int
- void MainWindow::addCuePath(QString path, QString val)
- {
-   Q_UNUSED(val);
--
-+
-   if (!path.startsWith(":"))  {
-       path =  "\"" + path + "\"";
-   }
-diff --git a/app/gui/qt/sonicpilexer.cpp b/app/gui/qt/sonicpilexer.cpp
-index 5e44742ad..3cc640475 100644
---- a/app/gui/qt/sonicpilexer.cpp
-+++ b/app/gui/qt/sonicpilexer.cpp
+@@ -2356,7 +2366,7 @@ void MainWindow::restoreScopeState(std::vector<QString> names) {
+     QSettings settings("sonic-pi.net", "gui-settings");
+ 
+     for ( auto name : names ) {
+-        bool def = (name.toLower() == "mono"); 
++        bool def = (name.toLower() == "mono");
+         piSettings->setScopeState(name, settings.value("prefs/scope/show-"+name.toLower(), def).toBool());
+     }
+ }
+diff --git a/app/gui/qt/model/sonicpitheme.cpp b/app/gui/qt/model/sonicpitheme.cpp
+index 76efefb45..cd4cf5d70 100644
+--- a/app/gui/qt/model/sonicpitheme.cpp
++++ b/app/gui/qt/model/sonicpitheme.cpp
+@@ -900,7 +900,7 @@ QString SonicPiTheme::getAppStylesheet() {
+     QString selectionBackgroundColor = this->color("SelectionBackground").name();
+     QString errorBackgroundColor = this->color("ErrorBackground").name();
+ 
+-    appStyling.replace("fixedWidthFont", "\"Hack\"");
++    appStyling.replace("fixedWidthFont", "\"Monoid HalfTight\"");
+ 
+     appStyling
+         .replace("windowColor", windowColor)
+diff --git a/app/gui/qt/theme/dark/doc-styles.css b/app/gui/qt/theme/dark/doc-styles.css
+index f3e3fc132..3e232199f 100644
+--- a/app/gui/qt/theme/dark/doc-styles.css
++++ b/app/gui/qt/theme/dark/doc-styles.css
+@@ -1,7 +1,7 @@
+ body {
+   font-family: HelveticaNeue-Light, Helvetica Neue Light, Helvetica Neue, Liberation Sans;
+   font-size: large;
+-  color: white;
++  color: #EBDBB2;
+   background-color: black;
+ }
+ 
+@@ -10,12 +10,12 @@ ul.toc {
+ }
+ 
+ a {
+-    color: #FBDE2D;
++    color: #FABD2F;
+     text-decoration: none;
+ }
+ 
+ em {
+-  color: darkorange;
++  color: #D65D0E;
+ }
+ 
+ .asciilogo {
+@@ -24,67 +24,67 @@ em {
+ }
+ 
+ .highlight {
+-    color: deeppink;
++    color: #D3869B;
+ }
+ 
+ .error_description {
+     font-size: medium;
+-    background-color: deeppink;
+-    color: white;
++    background-color: #D3869B;
++    color: #EBDBB2;
+ }
+ 
+ .syntax_error_description {
+     font-size: medium;
+-    background-color: dodgerblue;
+-    color: white;
++    background-color: #83A598;
++    color: #EBDBB2;
+ }
+ 
+ 
+ .backtrace {
+     font-size: small;
+-    color: #5e5e5e;
++    color: #D3869B;
+ }
+ 
+ .error_msg {
+     font-size: large;
+-    color: deeppink;
++    color: #D3869B;
+ }
+ 
+ .error_line {
+     font-size: large;
+-    color: #5e5e5e;
++    color: #504945;
+ }
+ 
+ .error_msg {
+     font-size: large;
+-    color: deeppink;
++    color: #D3869B;
+ }
+ 
+ 
+ pre {
+-    font-family: "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
++    font-family: "Monoid HalfTight", "Hack" "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
+ }
+ 
+ code {
+-    font-family: "Hack", "Courier New","Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
++    font-family: "Monoid HalfTight", "Hack", "Courier New","Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
+ 
+-    color: deeppink;
++    color: #D3869B;
+ }
+ 
+ code .symbol {
+-  color: deeppink;
++  color: #D3869B;
+ }
+ 
+ code .number {
+-  color: dodgerblue;
++  color: #83A598;
+ }
+ 
+ code .keyword {
+-  color: darkorange;
++  color: #D65D0E;
+ }
+ 
+ code .info {
+-  color: #5e5e5e;
++  color: #504945;
+ }
+ 
+ .version {
+@@ -96,12 +96,12 @@ code .info {
+ }
+ 
+ .usage {
+-    color: white;
++    color: #EBDBB2;
+ }
+ 
+ .usage code {
+   font-size: large;
+-  color: white;
++  color: #EBDBB2;
+   background-color: black;
+ }
+ 
+@@ -109,52 +109,52 @@ h1 {
+   font-size: xx-large;
+   font-weight: bold;
+   padding: 2px;
+-  color: white;
+-  background-color: deeppink;
++  color: #EBDBB2;
++  background-color: #D3869B;
+ }
+ 
+ h2 {
+   font-size: x-large;
+   font-weight: bold;
+   padding: 2px;
+-  color: white;
+-  background-color: #5d99f3;
++  color: #EBDBB2;
++  background-color: #98971A;
+ }
+ 
+ body.info {
+-    font-family: "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
++    font-family: "Monoid HalfTight", "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
+ }
+ 
+ body.info a {
+-  color: deeppink;
++  color: #D3869B;
+ }
+ 
+ body.example code {
+   font-size: large;
+-  color: deeppink;
++  color: #D3869B;
+ }
+ 
+ body.manual .introduced {
+-  color: darkorange;
++  color: #D65D0E;
+   font-size: medium;
+ }
+ 
+ body.manual table.arguments td {
+     font-size: medium;
+     padding: 2px;
+-    font-family: "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
++    font-family: "Monoid HalfTight", "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
+ }
+ 
+ body.manual table.arguments td.odd,
+ body.manual table.arguments td.odd a {
+     background-color: #e8e8e8;
+-    color: #5e5e5e;
++    color: #504945;
+ }
+ 
+ body.manual table.arguments td.even,
+ body.manual table.arguments td.even a {
+-  background-color: #5e5e5e;
+-  color: white;
++  background-color: #504945;
++  color: #EBDBB2;
+ }
+ 
+ body.manual table.details td {
+@@ -162,16 +162,16 @@ body.manual table.details td {
+ }
+ 
+ body.manual table.details td.key {
+-    font-family: "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
++    font-family: "Monoid HalfTight", "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
+   font-size: large;
+ }
+ 
+ body.manual table.details td.odd {
+-  background-color: #444;
++  background-color: #3C3836;
+ }
+ 
+ body.manual table.details td.even {
+-  background-color: #333;
++  background-color: #282828;
+ }
+ 
+ body.manual table.details td.odd.key {
+@@ -192,16 +192,16 @@ body.manual table.examples td {
+ }
+ 
+ body.manual table.examples code {
+-  color: #fff;
++  color: #EBDBB2;
+   font-size: medium;
+ }
+ 
+ body.manual table.examples td.odd {
+-  background-color: #444;
++  background-color: #3C3836;
+ }
+ 
+ body.manual table.examples td.even {
+-  background-color: #333;
++  background-color: #282828;
+ }
+ 
+ body.manual table.examples td.odd.head {
+diff --git a/app/gui/qt/theme/high_contrast/doc-styles.css b/app/gui/qt/theme/high_contrast/doc-styles.css
+index 0f142d708..3a7343a65 100644
+--- a/app/gui/qt/theme/high_contrast/doc-styles.css
++++ b/app/gui/qt/theme/high_contrast/doc-styles.css
+@@ -57,11 +57,11 @@ em {
+ }
+ 
+ pre {
+-    font-family: "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
++    font-family: "Monoid HalfTight", "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
+ }
+ 
+ code {
+-    font-family: "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
++    font-family: "Monoid HalfTight", "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
+     color: #99004A;
+ }
+ 
+@@ -116,7 +116,7 @@ h2 {
+ }
+ 
+ body.info {
+-    font-family: "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
++    font-family: "Monoid HalfTight", "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
+ }
+ 
+ body.info a {
+@@ -136,7 +136,7 @@ body.manual .introduced {
+ body.manual table.arguments td {
+     font-size: medium;
+     padding: 2px;
+-    font-family: "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
++    font-family: "Monoid HalfTight", "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
+ }
+ 
+ body.manual table.arguments td.odd,
+@@ -156,7 +156,7 @@ body.manual table.details td {
+ }
+ 
+ body.manual table.details td.key {
+-    font-family: "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
++    font-family: "Monoid HalfTight", "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
+   font-size: large;
+ }
+ 
+diff --git a/app/gui/qt/theme/light/doc-styles.css b/app/gui/qt/theme/light/doc-styles.css
+index 37ae88e33..789610eef 100644
+--- a/app/gui/qt/theme/light/doc-styles.css
++++ b/app/gui/qt/theme/light/doc-styles.css
+@@ -57,11 +57,11 @@ em {
+ }
+ 
+ pre {
+-    font-family: "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
++    font-family: "Monoid HalfTight", "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
+ }
+ 
+ code {
+-    font-family: "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
++    font-family: "Monoid HalfTight", "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
+     color: deeppink;
+ }
+ 
+@@ -116,7 +116,7 @@ h2 {
+ }
+ 
+ body.info {
+-    font-family: "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
++    font-family: "Monoid HalfTight", "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
+ }
+ 
+ body.info a {
+@@ -136,7 +136,7 @@ body.manual .introduced {
+ body.manual table.arguments td {
+     font-size: medium;
+     padding: 2px;
+-    font-family: "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
++    font-family: "Monoid HalfTight", "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
+ }
+ 
+ body.manual table.arguments td.odd,
+@@ -156,7 +156,7 @@ body.manual table.details td {
+ }
+ 
+ body.manual table.details td.key {
+-    font-family: "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
++    font-family: "Monoid HalfTight", "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
+   font-size: large;
+ }
+ 
+diff --git a/app/gui/qt/widgets/settingswidget.cpp b/app/gui/qt/widgets/settingswidget.cpp
+index bcf14a487..088faf57a 100644
+--- a/app/gui/qt/widgets/settingswidget.cpp
++++ b/app/gui/qt/widgets/settingswidget.cpp
+@@ -223,8 +223,8 @@ QGroupBox* SettingsWidget::createIoPrefsTab() {
+ 
+     midi_in_ports_label = new QLabel;
+     midi_out_ports_label = new QLabel;
+-    midi_in_ports_label->setFont(QFont("Hack"));
+-    midi_out_ports_label->setFont(QFont("Hack"));
++    midi_in_ports_label->setFont(QFont("Monoid HalfTight"));
++    midi_out_ports_label->setFont(QFont("Monoid HalfTight"));
+     midi_in_ports_label->setAccessibleName("midi-in-ports-label");
+     midi_out_ports_label->setAccessibleName("midi-out-ports-label");
+     midi_in_ports_label->setText(tr("No connected input devices"));
+@@ -301,7 +301,7 @@ QGroupBox* SettingsWidget::createEditorPrefsTab() {
+     colourModeButtonGroup->addButton(darkProModeCheck, 3);
+     colourModeButtonGroup->addButton(highContrastModeCheck, 4);
+ 
+-    lightModeCheck->setChecked(true);
++    darkProModeCheck->setChecked(true);
+ 
+     QVBoxLayout *editor_display_box_layout = new QVBoxLayout;
+     QVBoxLayout *editor_box_look_feel_layout = new QVBoxLayout;
+diff --git a/app/gui/qt/widgets/sonicpilexer.cpp b/app/gui/qt/widgets/sonicpilexer.cpp
+index 5e44742ad..db638d2a3 100644
+--- a/app/gui/qt/widgets/sonicpilexer.cpp
++++ b/app/gui/qt/widgets/sonicpilexer.cpp
 @@ -23,7 +23,7 @@ SonicPiLexer::SonicPiLexer(SonicPiTheme *theme) : QsciLexerRuby() {
      this->setDefaultPaper(theme->color("Background"));
  }
-
+ 
 -static char default_font[] = "Hack";
 +static char default_font[] = "Monoid HalfTight";
-
+ 
  // triggers autocompletion for the next word
  QStringList SonicPiLexer::autoCompletionWordSeparators() const {
-diff --git a/app/gui/qt/sonicpiscintilla.cpp b/app/gui/qt/sonicpiscintilla.cpp
-index be6db189f..0e7e82e7b 100644
---- a/app/gui/qt/sonicpiscintilla.cpp
-+++ b/app/gui/qt/sonicpiscintilla.cpp
+diff --git a/app/gui/qt/widgets/sonicpiscintilla.cpp b/app/gui/qt/widgets/sonicpiscintilla.cpp
+index b2c5ca092..53da3512a 100644
+--- a/app/gui/qt/widgets/sonicpiscintilla.cpp
++++ b/app/gui/qt/widgets/sonicpiscintilla.cpp
 @@ -133,7 +133,7 @@ SonicPiScintilla::SonicPiScintilla(SonicPiLexer *lexer, SonicPiTheme *theme, QSt
-
+ 
    setMarginsBackgroundColor(theme->color("MarginBackground"));
    setMarginsForegroundColor(theme->color("MarginForeground"));
 -  setMarginsFont(QFont("Hack", 15, -1, true));
@@ -143,138 +518,3 @@ index be6db189f..0e7e82e7b 100644
    setUtf8(true);
    setText("# Loading previous buffer contents. Please wait...");
    setLexer((QsciLexer *)lexer);
-diff --git a/app/gui/qt/theme/dark/doc-styles.css b/app/gui/qt/theme/dark/doc-styles.css
-index f3e3fc132..6ffa5fcb5 100644
---- a/app/gui/qt/theme/dark/doc-styles.css
-+++ b/app/gui/qt/theme/dark/doc-styles.css
-@@ -62,11 +62,11 @@ em {
-
-
- pre {
--    font-family: "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
-+    font-family: "Monoid HalfTight", "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
- }
-
- code {
--    font-family: "Hack", "Courier New","Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
-+    font-family: "Monoid HalfTight", "Hack", "Courier New","Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
-
-     color: deeppink;
- }
-@@ -122,7 +122,7 @@ h2 {
- }
-
- body.info {
--    font-family: "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
-+    font-family: "Monoid HalfTight", "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
- }
-
- body.info a {
-@@ -142,7 +142,7 @@ body.manual .introduced {
- body.manual table.arguments td {
-     font-size: medium;
-     padding: 2px;
--    font-family: "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
-+    font-family: "Monoid HalfTight", "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
- }
-
- body.manual table.arguments td.odd,
-@@ -162,7 +162,7 @@ body.manual table.details td {
- }
-
- body.manual table.details td.key {
--    font-family: "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
-+    font-family: "Monoid HalfTight", "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
-   font-size: large;
- }
-
-diff --git a/app/gui/qt/theme/high_contrast/doc-styles.css b/app/gui/qt/theme/high_contrast/doc-styles.css
-index 0f142d708..6ef7b82d5 100644
---- a/app/gui/qt/theme/high_contrast/doc-styles.css
-+++ b/app/gui/qt/theme/high_contrast/doc-styles.css
-@@ -57,11 +57,11 @@ em {
- }
-
- pre {
--    font-family: "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
-+    font-family: "Monoid HalfTight", "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
- }
-
- code {
--    font-family: "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
-+    font-family: "Monoid HalfTight", "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
-     color: #99004A;
- }
-
-@@ -116,7 +116,7 @@ h2 {
- }
-
- body.info {
--    font-family: "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
-+    font-family: "Monoid HalfTight", "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
- }
-
- body.info a {
-@@ -136,7 +136,7 @@ body.manual .introduced {
- body.manual table.arguments td {
-     font-size: medium;
-     padding: 2px;
--    font-family: "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
-+    font-family: "Monoid HalfTight", "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
- }
-
- body.manual table.arguments td.odd,
-@@ -156,7 +156,7 @@ body.manual table.details td {
- }
-
- body.manual table.details td.key {
--    font-family: "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
-+    font-family: "Monoid HalfTight", "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
-   font-size: large;
- }
-
-diff --git a/app/gui/qt/theme/light/doc-styles.css b/app/gui/qt/theme/light/doc-styles.css
-index 37ae88e33..712248548 100644
---- a/app/gui/qt/theme/light/doc-styles.css
-+++ b/app/gui/qt/theme/light/doc-styles.css
-@@ -57,11 +57,11 @@ em {
- }
-
- pre {
--    font-family: "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
-+    font-family: "Monoid HalfTight", "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
- }
-
- code {
--    font-family: "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
-+    font-family: "Monoid HalfTight", "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
-     color: deeppink;
- }
-
-@@ -116,7 +116,7 @@ h2 {
- }
-
- body.info {
--    font-family: "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
-+    font-family: "Monoid HalfTight", "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
- }
-
- body.info a {
-@@ -136,7 +136,7 @@ body.manual .introduced {
- body.manual table.arguments td {
-     font-size: medium;
-     padding: 2px;
--    font-family: "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
-+    font-family: "Monoid HalfTight", "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
- }
-
- body.manual table.arguments td.odd,
-@@ -156,7 +156,7 @@ body.manual table.details td {
- }
-
- body.manual table.details td.key {
--    font-family: "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
-+    font-family: "Monoid HalfTight", "Hack", "Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
-   font-size: large;
- }
-
