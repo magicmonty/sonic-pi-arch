@@ -4,7 +4,7 @@
 # Contributor: Simon Dreher <code@simon-dreher.de>
 
 pkgname=sonic-pi-git
-pkgver=v3.0.r1096.g8b595f142
+pkgver=v3.0.r1100.g6614abe70
 pkgrel=1
 pkgdesc="A music-centric programming environment, originally built for the raspberry pi."
 arch=('i686'
@@ -51,7 +51,7 @@ prepare() {
   msg2 "Hook up qwt to qmake"
   qmake -set QMAKEFEATURES usr/share/qt4/mkspecs/features
 
-  msg2 "Fix wrongly-named (on Arch) QT library"
+  #msg2 "Fix wrongly-named (on Arch) QT library"
   find $srcdir/sonic-pi/app/gui/qt -type f -name "*" -readable -exec sed -i 's/lqt5scintilla2/lqscintilla2_qt5/g' {} +
 
   #Patch build-ubuntu-app script to skip ubuntu-specific (and redundant) options
@@ -62,7 +62,7 @@ prepare() {
   cp $srcdir/sonic-pi-ruby-2.5.patch $srcdir/sonic-pi
   cd $srcdir/sonic-pi
   patch -p 1 < ./sonic-pi-ruby-2.5.patch
-  rm $srcdir/sonic-pi-ruby-2.5.patch
+  rm $srcdir/sonic-pi/sonic-pi-ruby-2.5.patch
 }
 
 build() {
