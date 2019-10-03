@@ -28,7 +28,7 @@ index 728218461..4616755d2 100644
    qRegisterMetaType<SonicPiLog::MultiMessage>("SonicPiLog::MultiMessage");
  
 diff --git a/app/gui/qt/mainwindow.cpp b/app/gui/qt/mainwindow.cpp
-index d0273327e..5443c3c21 100644
+index d0273327e..d6f21c122 100644
 --- a/app/gui/qt/mainwindow.cpp
 +++ b/app/gui/qt/mainwindow.cpp
 @@ -144,7 +144,7 @@ MainWindow::MainWindow(QApplication &app, bool i18n, QSplashScreen* splash)
@@ -61,7 +61,54 @@ index d0273327e..5443c3c21 100644
  
      if(!theme->font("LogFace").isEmpty()){
          outputPane->setFontFamily(theme->font("LogFace"));
-@@ -1669,10 +1669,9 @@ void MainWindow::about() {
+@@ -818,6 +818,46 @@ void MainWindow::escapeWorkspaces() {
+     }
+ }
+ 
++void MainWindow::changeTab0(){
++    tabs->setCurrentIndex(0);
++}
++
++void MainWindow::changeTab1(){
++    tabs->setCurrentIndex(1);
++}
++
++void MainWindow::changeTab2(){
++    tabs->setCurrentIndex(2);
++}
++
++void MainWindow::changeTab3(){
++    tabs->setCurrentIndex(3);
++}
++
++void MainWindow::changeTab4(){
++    tabs->setCurrentIndex(4);
++}
++
++void MainWindow::changeTab5(){
++    tabs->setCurrentIndex(5);
++}
++
++void MainWindow::changeTab6(){
++    tabs->setCurrentIndex(6);
++}
++
++void MainWindow::changeTab7(){
++    tabs->setCurrentIndex(7);
++}
++
++void MainWindow::changeTab8(){
++    tabs->setCurrentIndex(8);
++}
++
++void MainWindow::changeTab9(){
++    tabs->setCurrentIndex(9);
++}
++
+ void MainWindow::changeTab(int id){
+     tabs->setCurrentIndex(id);
+ }
+@@ -1669,10 +1709,9 @@ void MainWindow::about() {
      // Qt::Tool windows get closed automatically when app loses focus
      if(infoWidg->isVisible()) {
          infoWidg->hide();
@@ -74,7 +121,7 @@ index d0273327e..5443c3c21 100644
      }
      infoAct->setIcon( theme->getInfoIcon( infoWidg->isVisible()));
  }
-@@ -1762,15 +1761,15 @@ void MainWindow::toggleScopeAxes()
+@@ -1762,15 +1801,15 @@ void MainWindow::toggleScopeAxes()
  }
  
  void MainWindow::cycleThemes() {
@@ -95,7 +142,7 @@ index d0273327e..5443c3c21 100644
          piSettings->theme = SonicPiTheme::LightMode;
      }
      updateColourTheme();
-@@ -2018,8 +2017,8 @@ void MainWindow::updateAction(QAction *action, QShortcut *sc, QString tooltip,
+@@ -2018,8 +2057,8 @@ void MainWindow::updateAction(QAction *action, QShortcut *sc, QString tooltip,
  void MainWindow::createShortcuts()
  {
      std::cout << "[GUI] - creating shortcuts" << std::endl;
@@ -106,25 +153,25 @@ index d0273327e..5443c3c21 100644
      new QShortcut(QKeySequence("F8"), this, SLOT(reloadServerCode()));
      new QShortcut(QKeySequence("F9"), this, SLOT(toggleButtonVisibility()));
      new QShortcut(shiftMetaKey('B'), this, SLOT(toggleButtonVisibility()));
-@@ -2029,6 +2028,17 @@ void MainWindow::createShortcuts()
+@@ -2029,6 +2068,17 @@ void MainWindow::createShortcuts()
      new QShortcut(QKeySequence("F11"), this, SLOT(toggleLogVisibility()));
      new QShortcut(shiftMetaKey('L'), this, SLOT(toggleLogVisibility()));
      new QShortcut(QKeySequence("F12"),this, SLOT(toggleScopePaused()));
 +
-+    new QShortcut(shiftMetaKey('1'), this, SLOT(changeTab(0)));
-+    new QShortcut(shiftMetaKey('2'), this, SLOT(changeTab(1)));
-+    new QShortcut(shiftMetaKey('3'), this, SLOT(changeTab(2)));
-+    new QShortcut(shiftMetaKey('4'), this, SLOT(changeTab(3)));
-+    new QShortcut(shiftMetaKey('5'), this, SLOT(changeTab(4)));
-+    new QShortcut(shiftMetaKey('6'), this, SLOT(changeTab(5)));
-+    new QShortcut(shiftMetaKey('7'), this, SLOT(changeTab(6)));
-+    new QShortcut(shiftMetaKey('8'), this, SLOT(changeTab(7)));
-+    new QShortcut(shiftMetaKey('9'), this, SLOT(changeTab(8)));
-+    new QShortcut(shiftMetaKey('0'), this, SLOT(changeTab(9)));
++    new QShortcut(shiftMetaKey('1'), this, SLOT(changeTab0()));
++    new QShortcut(shiftMetaKey('2'), this, SLOT(changeTab1()));
++    new QShortcut(shiftMetaKey('3'), this, SLOT(changeTab2()));
++    new QShortcut(shiftMetaKey('4'), this, SLOT(changeTab3()));
++    new QShortcut(shiftMetaKey('5'), this, SLOT(changeTab4()));
++    new QShortcut(shiftMetaKey('6'), this, SLOT(changeTab5()));
++    new QShortcut(shiftMetaKey('7'), this, SLOT(changeTab6()));
++    new QShortcut(shiftMetaKey('8'), this, SLOT(changeTab7()));
++    new QShortcut(shiftMetaKey('9'), this, SLOT(changeTab8()));
++    new QShortcut(shiftMetaKey('0'), this, SLOT(changeTab9()));
  }
  
  void  MainWindow::createToolBar()
-@@ -2356,7 +2366,7 @@ void MainWindow::restoreScopeState(std::vector<QString> names) {
+@@ -2356,7 +2406,7 @@ void MainWindow::restoreScopeState(std::vector<QString> names) {
      QSettings settings("sonic-pi.net", "gui-settings");
  
      for ( auto name : names ) {
@@ -133,11 +180,200 @@ index d0273327e..5443c3c21 100644
          piSettings->setScopeState(name, settings.value("prefs/scope/show-"+name.toLower(), def).toBool());
      }
  }
+diff --git a/app/gui/qt/mainwindow.h b/app/gui/qt/mainwindow.h
+index 6fec89903..ff481130f 100644
+--- a/app/gui/qt/mainwindow.h
++++ b/app/gui/qt/mainwindow.h
+@@ -1,4 +1,4 @@
+-//--
++                                                        //--
+ // This file is part of Sonic Pi: http://sonic-pi.net
+ // Full project source: https://github.com/samaaron/sonic-pi
+ // License: https://github.com/samaaron/sonic-pi/blob/master/LICENSE.md
+@@ -103,6 +103,16 @@ signals:
+         QString sonicPiHomePath();
+         void updateLogAutoScroll();
+         bool eventFilter(QObject *obj, QEvent *evt);
++        void changeTab0();
++        void changeTab1();
++        void changeTab2();
++        void changeTab3();
++        void changeTab4();
++        void changeTab5();
++        void changeTab6();
++        void changeTab7();
++        void changeTab8();
++        void changeTab9();
+         void changeTab(int id);
+         QString asciiArtLogo();
+         void printAsciiArtLogo();
 diff --git a/app/gui/qt/model/sonicpitheme.cpp b/app/gui/qt/model/sonicpitheme.cpp
-index 76efefb45..cd4cf5d70 100644
+index 76efefb45..6a6d583c1 100644
 --- a/app/gui/qt/model/sonicpitheme.cpp
 +++ b/app/gui/qt/model/sonicpitheme.cpp
-@@ -900,7 +900,7 @@ QString SonicPiTheme::getAppStylesheet() {
+@@ -30,8 +30,8 @@ SonicPiTheme::SonicPiTheme(QObject *parent, QString customSettingsFilename, QStr
+     loadToolBarIcons();
+ 
+     QMap<QString, QString> themeSettings;
+-    this->theme = lightTheme();
+-    switchTheme( SonicPiTheme::LightMode );
++    this->theme = darkTheme();
++    switchTheme( SonicPiTheme::DarkProMode );
+ 
+     // if(settings!=0){
+     //   QStringList customSettingKeys = settings->allKeys();
+@@ -66,7 +66,7 @@ void SonicPiTheme::switchTheme(Theme theme) {
+         helpIcon = &default_dark_help_icon;
+         helpIconActive = &default_dark_help_toggled_icon;
+         recIcon = &default_dark_rec_icon;
+-        recIconA = &default_dark_rec_a_icon; 
++        recIconA = &default_dark_rec_a_icon;
+         recIconB = &default_dark_rec_b_icon;
+         prefsIcon = &default_dark_prefs_icon;
+         prefsIconActive = &default_dark_prefs_toggled_icon;
+@@ -108,7 +108,7 @@ void SonicPiTheme::switchTheme(Theme theme) {
+         helpIcon = &default_light_help_icon;
+         helpIconActive = &default_light_help_toggled_icon;
+         recIcon = &default_light_rec_icon;
+-        recIconA = &default_light_rec_a_icon; 
++        recIconA = &default_light_rec_a_icon;
+         recIconB = &default_light_rec_b_icon;
+         prefsIcon = &default_light_prefs_icon;
+         prefsIconActive = &default_light_prefs_toggled_icon;
+@@ -150,7 +150,7 @@ void SonicPiTheme::switchTheme(Theme theme) {
+         helpIcon = &default_hc_help_icon;
+         helpIconActive = &default_hc_help_toggled_icon;
+         recIcon = &default_hc_rec_icon;
+-        recIconA = &default_hc_rec_a_icon; 
++        recIconA = &default_hc_rec_a_icon;
+         recIconB = &default_hc_rec_b_icon;
+         prefsIcon = &default_hc_prefs_icon;
+         prefsIconActive = &default_hc_prefs_toggled_icon;
+@@ -171,7 +171,7 @@ void SonicPiTheme::switchTheme(Theme theme) {
+         helpIcon = &pro_help_icon;
+         helpIconActive = &pro_help_bordered_icon;
+         recIcon = &default_light_rec_icon;
+-        recIconA = &default_light_rec_a_icon; 
++        recIconA = &default_light_rec_a_icon;
+         recIconB = &default_light_rec_b_icon;
+         prefsIcon = &default_light_prefs_icon;
+         prefsIconActive = &default_light_prefs_toggled_icon;
+@@ -220,25 +220,25 @@ QMap<QString, QString> SonicPiTheme::lightTheme(){
+     QMap<QString, QString> themeSettings;
+ 
+     // Light Theme Colour Palette
+-    QString dt_pink = "deeppink";
+-    QString dt_white = "white";
++    QString dt_pink = "#fe8019";
++    QString dt_white = "#ebdbb2";
+ 
+ 
+-    QString dt_lightgrey = "#ededed"; // same as button background
+-    QString dt_grey = "#d3d3d3";
+-    QString dt_darkgrey = "#5e5e5e";
+-    QString dt_vdarkgrey = "#1e1e1e";
+-    QString dt_black = "#000";
++    QString dt_lightgrey = "#a89984"; // same as button background
++    QString dt_grey = "#928374";
++    QString dt_darkgrey = "#504945";
++    QString dt_vdarkgrey = "#3c3836";
++    QString dt_black = "#282828";
+ 
+-    QString dt_blue = "#1e90ff";
+-    QString dt_gold = "#ff8c00";
+-    QString dt_orange = "darkorange";
+-    QString dt_not_supported = "#000";
+-    QString dt_warning = "red";
+-    QString dt_green = "#61CE3C";
++    QString dt_blue = "#458588";
++    QString dt_gold = "#d79921";
++    QString dt_orange = "#d65d0e";
++    QString dt_not_supported = "#282828";
++    QString dt_warning = "cc241d";
++    QString dt_green = "#98971a";
+ 
+-    QString theme_bg = dt_lightgrey;
+-    QString theme_fg = dt_darkgrey;
++    QString theme_bg = dt_white;
++    QString theme_fg = dt_black;
+ 
+     themeSettings["Base"] = dt_lightgrey;
+     themeSettings["AlternateBase"] = dt_grey;
+@@ -424,21 +424,24 @@ QMap<QString, QString> SonicPiTheme::darkTheme(){
+ 
+     // Dark Theme Colour Palette
+ 
+-    QString dt_pink = "deeppink";
+-    QString dt_white = "white";
+-    QString dt_lightgrey = "#ededed";
++    QString dt_pink = "#fe8019";
++    QString dt_white = "#ebdbb2";
++    QString dt_lightgrey = "#a89984";
+ 
+-    QString dt_grey = "#5e5e5e"; // same as button background
+-    QString dt_darkgrey = "#1e1e1e";
+-    QString dt_vdarkgrey = "#0d0d0d";
+-    QString dt_black = "#000";
++    QString dt_grey = "#928374";
++    QString dt_darkgrey = "#504945";
++    QString dt_vdarkgrey = "#3c3836";
++    QString dt_black = "#282828";
+ 
+-    QString dt_blue = "#4c83ff";
+-    QString dt_gold = "#FBDE2D";
+-    QString dt_orange = "darkorange";
+-    QString dt_not_supported = "white";
+-    QString dt_warning = "red";
+-    QString dt_green = "#61CE3C";
++    QString dt_blue = "#458588";
++    QString dt_gold = "#d3869b";
++    QString dt_orange = "#d65d0e";
++    QString dt_not_supported = dt_white;
++    QString dt_warning = "cc241d";
++    QString dt_green = "#b8bb26";
++
++    QString theme_bg = dt_black;
++    QString theme_fg = dt_white;
+ 
+     themeSettings["Base"] = dt_darkgrey;
+     themeSettings["AlternateBase"] = dt_grey;
+@@ -474,7 +477,7 @@ QMap<QString, QString> SonicPiTheme::darkTheme(){
+     themeSettings["MenuSelected"] = dt_pink;
+     themeSettings["MenuSelectedText"] = dt_white;
+ 
+-    themeSettings["Foreground"]                      = dt_lightgrey;
++    themeSettings["Foreground"]                      = dt_white;
+     themeSettings["Background"]                      = dt_black;
+ 
+     themeSettings["HighlightedForeground"]           = dt_white;
+@@ -492,7 +495,7 @@ QMap<QString, QString> SonicPiTheme::darkTheme(){
+     themeSettings["DefaultForeground"]               = dt_white;
+     themeSettings["DefaultBackground"]               = dt_black;
+ 
+-    themeSettings["CommentForeground"]               = dt_grey;
++    themeSettings["CommentForeground"]               = dt_darkgrey;
+     themeSettings["CommentBackground"]               = dt_black;
+ 
+     themeSettings["PODForeground"]                   = dt_white;
+@@ -523,7 +526,7 @@ QMap<QString, QString> SonicPiTheme::darkTheme(){
+ 
+     themeSettings["ClassVariableForeground"]         = dt_not_supported;
+ 
+-    themeSettings["BackticksForeground"]             = dt_warning;
++    themeSettings["BackticksForeground"]             = "#fb4934";
+     themeSettings["BackticksBackground"]             = dt_gold;
+ 
+     themeSettings["PercentStringxForeground"]        = dt_not_supported;
+@@ -826,7 +829,7 @@ QMap<QString, QString> SonicPiTheme::highContrastTheme(){
+ }
+ 
+ QPalette SonicPiTheme::createPalette() {
+-    QPalette p = QApplication::palette(); 
++    QPalette p = QApplication::palette();
+     p.setColor(QPalette::WindowText,      color("WindowForeground"));
+     p.setColor(QPalette::Window,          color("WindowBackground"));
+     p.setColor(QPalette::Base,            color("Base"));
+@@ -900,7 +903,7 @@ QString SonicPiTheme::getAppStylesheet() {
      QString selectionBackgroundColor = this->color("SelectionBackground").name();
      QString errorBackgroundColor = this->color("ErrorBackground").name();
  
@@ -147,18 +383,20 @@ index 76efefb45..cd4cf5d70 100644
      appStyling
          .replace("windowColor", windowColor)
 diff --git a/app/gui/qt/theme/dark/doc-styles.css b/app/gui/qt/theme/dark/doc-styles.css
-index f3e3fc132..3e232199f 100644
+index f3e3fc132..938391ad2 100644
 --- a/app/gui/qt/theme/dark/doc-styles.css
 +++ b/app/gui/qt/theme/dark/doc-styles.css
-@@ -1,7 +1,7 @@
+@@ -1,8 +1,8 @@
  body {
    font-family: HelveticaNeue-Light, Helvetica Neue Light, Helvetica Neue, Liberation Sans;
    font-size: large;
 -  color: white;
+-  background-color: black;
 +  color: #EBDBB2;
-   background-color: black;
++  background-color: #282828;
  }
  
+ ul.toc {
 @@ -10,12 +10,12 @@ ul.toc {
  }
  
@@ -170,7 +408,7 @@ index f3e3fc132..3e232199f 100644
  
  em {
 -  color: darkorange;
-+  color: #D65D0E;
++  color: #FE8019;
  }
  
  .asciilogo {
@@ -179,14 +417,14 @@ index f3e3fc132..3e232199f 100644
  
  .highlight {
 -    color: deeppink;
-+    color: #D3869B;
++    color: #D65D0E;
  }
  
  .error_description {
      font-size: medium;
 -    background-color: deeppink;
 -    color: white;
-+    background-color: #D3869B;
++    background-color: #D65D0E;
 +    color: #EBDBB2;
  }
  
@@ -202,25 +440,25 @@ index f3e3fc132..3e232199f 100644
  .backtrace {
      font-size: small;
 -    color: #5e5e5e;
-+    color: #D3869B;
++    color: #D65D0E;
  }
  
  .error_msg {
      font-size: large;
 -    color: deeppink;
-+    color: #D3869B;
++    color: #D65D0E;
  }
  
  .error_line {
      font-size: large;
 -    color: #5e5e5e;
-+    color: #504945;
++    color: #928374;
  }
  
  .error_msg {
      font-size: large;
 -    color: deeppink;
-+    color: #D3869B;
++    color: #D65D0E;
  }
  
  
@@ -234,12 +472,12 @@ index f3e3fc132..3e232199f 100644
 +    font-family: "Monoid HalfTight", "Hack", "Courier New","Menlo", "Bitstream Vera Sans Mono", "DejaVu Sans Mono",  "Liberation Mono", "DroidSansMono", "Lucida Console", Consolas, Terminal, Monaco, "Courier New", monospace;
  
 -    color: deeppink;
-+    color: #D3869B;
++    color: #D65D0E;
  }
  
  code .symbol {
 -  color: deeppink;
-+  color: #D3869B;
++  color: #D65D0E;
  }
  
  code .number {
@@ -249,16 +487,16 @@ index f3e3fc132..3e232199f 100644
  
  code .keyword {
 -  color: darkorange;
-+  color: #D65D0E;
++  color: #FE8019;
  }
  
  code .info {
 -  color: #5e5e5e;
-+  color: #504945;
++  color: #928374;
  }
  
  .version {
-@@ -96,12 +96,12 @@ code .info {
+@@ -96,65 +96,65 @@ code .info {
  }
  
  .usage {
@@ -269,18 +507,19 @@ index f3e3fc132..3e232199f 100644
  .usage code {
    font-size: large;
 -  color: white;
+-  background-color: black;
 +  color: #EBDBB2;
-   background-color: black;
++  background-color: #282828;
  }
  
-@@ -109,52 +109,52 @@ h1 {
+ h1 {
    font-size: xx-large;
    font-weight: bold;
    padding: 2px;
 -  color: white;
 -  background-color: deeppink;
 +  color: #EBDBB2;
-+  background-color: #D3869B;
++  background-color: #D65D0E;
  }
  
  h2 {
@@ -300,18 +539,18 @@ index f3e3fc132..3e232199f 100644
  
  body.info a {
 -  color: deeppink;
-+  color: #D3869B;
++  color: #D65D0E;
  }
  
  body.example code {
    font-size: large;
 -  color: deeppink;
-+  color: #D3869B;
++  color: #D65D0E;
  }
  
  body.manual .introduced {
 -  color: darkorange;
-+  color: #D65D0E;
++  color: #FE8019;
    font-size: medium;
  }
  
@@ -326,14 +565,14 @@ index f3e3fc132..3e232199f 100644
  body.manual table.arguments td.odd a {
      background-color: #e8e8e8;
 -    color: #5e5e5e;
-+    color: #504945;
++    color: #928374;
  }
  
  body.manual table.arguments td.even,
  body.manual table.arguments td.even a {
 -  background-color: #5e5e5e;
 -  color: white;
-+  background-color: #504945;
++  background-color: #928374;
 +  color: #EBDBB2;
  }
  
