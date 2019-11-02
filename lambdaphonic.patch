@@ -28,10 +28,10 @@ index 728218461..27a5230e3 100644
    qRegisterMetaType<SonicPiLog::MultiMessage>("SonicPiLog::MultiMessage");
  
 diff --git a/app/gui/qt/mainwindow.cpp b/app/gui/qt/mainwindow.cpp
-index 47a90be07..915fba74f 100644
+index f83527dce..c72d39413 100644
 --- a/app/gui/qt/mainwindow.cpp
 +++ b/app/gui/qt/mainwindow.cpp
-@@ -690,9 +690,9 @@ void MainWindow::setupWindowStructure() {
+@@ -692,9 +692,9 @@ void MainWindow::setupWindowStructure() {
      incomingPane->setReadOnly(true);
      errorPane->setReadOnly(true);
      outputPane->setLineWrapMode(QPlainTextEdit::NoWrap);
@@ -43,7 +43,7 @@ index 47a90be07..915fba74f 100644
  
      if(!theme->font("LogFace").isEmpty()){
          outputPane->setFontFamily(theme->font("LogFace"));
-@@ -822,6 +822,46 @@ void MainWindow::changeTab(int id){
+@@ -824,6 +824,46 @@ void MainWindow::changeTab(int id){
      tabs->setCurrentIndex(id);
  }
  
@@ -90,7 +90,7 @@ index 47a90be07..915fba74f 100644
  void MainWindow::toggleFullScreenMode() {
      piSettings->full_screen = !piSettings->full_screen;
      emit settingsChanged();
-@@ -1665,8 +1705,8 @@ void MainWindow::about() {
+@@ -1667,8 +1707,8 @@ void MainWindow::about() {
          infoWidg->hide();
  
      } else {
@@ -101,7 +101,7 @@ index 47a90be07..915fba74f 100644
      }
      infoAct->setIcon( theme->getInfoIcon( infoWidg->isVisible()));
  }
-@@ -2012,8 +2052,8 @@ void MainWindow::updateAction(QAction *action, QShortcut *sc, QString tooltip,
+@@ -2015,8 +2055,8 @@ void MainWindow::updateAction(QAction *action, QShortcut *sc, QString tooltip,
  void MainWindow::createShortcuts()
  {
      std::cout << "[GUI] - creating shortcuts" << std::endl;
@@ -112,24 +112,32 @@ index 47a90be07..915fba74f 100644
      new QShortcut(QKeySequence("F8"), this, SLOT(reloadServerCode()));
      new QShortcut(QKeySequence("F9"), this, SLOT(toggleButtonVisibility()));
      new QShortcut(shiftMetaKey('B'), this, SLOT(toggleButtonVisibility()));
-@@ -2023,6 +2063,17 @@ void MainWindow::createShortcuts()
+@@ -2026,6 +2066,17 @@ void MainWindow::createShortcuts()
      new QShortcut(QKeySequence("F11"), this, SLOT(toggleLogVisibility()));
      new QShortcut(shiftMetaKey('L'), this, SLOT(toggleLogVisibility()));
      new QShortcut(QKeySequence("F12"),this, SLOT(toggleScopePaused()));
 +
-+    new QShortcut(shiftMetaKey('1'), this, SLOT(changeTab0()));
-+    new QShortcut(shiftMetaKey('2'), this, SLOT(changeTab1()));
-+    new QShortcut(shiftMetaKey('3'), this, SLOT(changeTab2()));
-+    new QShortcut(shiftMetaKey('4'), this, SLOT(changeTab3()));
-+    new QShortcut(shiftMetaKey('5'), this, SLOT(changeTab4()));
-+    new QShortcut(shiftMetaKey('6'), this, SLOT(changeTab5()));
-+    new QShortcut(shiftMetaKey('7'), this, SLOT(changeTab6()));
-+    new QShortcut(shiftMetaKey('8'), this, SLOT(changeTab7()));
-+    new QShortcut(shiftMetaKey('9'), this, SLOT(changeTab8()));
-+    new QShortcut(shiftMetaKey('0'), this, SLOT(changeTab9()));
++    new QShortcut(shiftMetaKey('0'), this, SLOT(changeTab0()));
++    new QShortcut(shiftMetaKey('1'), this, SLOT(changeTab1()));
++    new QShortcut(shiftMetaKey('2'), this, SLOT(changeTab2()));
++    new QShortcut(shiftMetaKey('3'), this, SLOT(changeTab3()));
++    new QShortcut(shiftMetaKey('4'), this, SLOT(changeTab4()));
++    new QShortcut(shiftMetaKey('5'), this, SLOT(changeTab5()));
++    new QShortcut(shiftMetaKey('6'), this, SLOT(changeTab6()));
++    new QShortcut(shiftMetaKey('7'), this, SLOT(changeTab7()));
++    new QShortcut(shiftMetaKey('8'), this, SLOT(changeTab8()));
++    new QShortcut(shiftMetaKey('9'), this, SLOT(changeTab9()));
  }
  
  void  MainWindow::createToolBar()
+@@ -2345,6 +2396,7 @@ void MainWindow::readSettings() {
+     piSettings->show_scope_axes = settings.value("prefs/scope/show-axes", false).toBool();
+     piSettings->show_incoming_osc_log = settings.value("prefs/show_incoming_osc_log", true).toBool();
+ 
++    piSettings->theme = SonicPiTheme::DarkProMode;
+     emit settingsChanged();
+ }
+ 
 diff --git a/app/gui/qt/mainwindow.h b/app/gui/qt/mainwindow.h
 index 6fec89903..b72696b95 100644
 --- a/app/gui/qt/mainwindow.h
@@ -152,7 +160,7 @@ index 6fec89903..b72696b95 100644
          void printAsciiArtLogo();
          void runCode();
 diff --git a/app/gui/qt/model/sonicpitheme.cpp b/app/gui/qt/model/sonicpitheme.cpp
-index 76efefb45..5a4fa0611 100644
+index 1e6eb2b8c..3b62b184b 100644
 --- a/app/gui/qt/model/sonicpitheme.cpp
 +++ b/app/gui/qt/model/sonicpitheme.cpp
 @@ -30,8 +30,8 @@ SonicPiTheme::SonicPiTheme(QObject *parent, QString customSettingsFilename, QStr
@@ -166,42 +174,6 @@ index 76efefb45..5a4fa0611 100644
  
      // if(settings!=0){
      //   QStringList customSettingKeys = settings->allKeys();
-@@ -66,7 +66,7 @@ void SonicPiTheme::switchTheme(Theme theme) {
-         helpIcon = &default_dark_help_icon;
-         helpIconActive = &default_dark_help_toggled_icon;
-         recIcon = &default_dark_rec_icon;
--        recIconA = &default_dark_rec_a_icon; 
-+        recIconA = &default_dark_rec_a_icon;
-         recIconB = &default_dark_rec_b_icon;
-         prefsIcon = &default_dark_prefs_icon;
-         prefsIconActive = &default_dark_prefs_toggled_icon;
-@@ -108,7 +108,7 @@ void SonicPiTheme::switchTheme(Theme theme) {
-         helpIcon = &default_light_help_icon;
-         helpIconActive = &default_light_help_toggled_icon;
-         recIcon = &default_light_rec_icon;
--        recIconA = &default_light_rec_a_icon; 
-+        recIconA = &default_light_rec_a_icon;
-         recIconB = &default_light_rec_b_icon;
-         prefsIcon = &default_light_prefs_icon;
-         prefsIconActive = &default_light_prefs_toggled_icon;
-@@ -150,7 +150,7 @@ void SonicPiTheme::switchTheme(Theme theme) {
-         helpIcon = &default_hc_help_icon;
-         helpIconActive = &default_hc_help_toggled_icon;
-         recIcon = &default_hc_rec_icon;
--        recIconA = &default_hc_rec_a_icon; 
-+        recIconA = &default_hc_rec_a_icon;
-         recIconB = &default_hc_rec_b_icon;
-         prefsIcon = &default_hc_prefs_icon;
-         prefsIconActive = &default_hc_prefs_toggled_icon;
-@@ -171,7 +171,7 @@ void SonicPiTheme::switchTheme(Theme theme) {
-         helpIcon = &pro_help_icon;
-         helpIconActive = &pro_help_bordered_icon;
-         recIcon = &default_light_rec_icon;
--        recIconA = &default_light_rec_a_icon; 
-+        recIconA = &default_light_rec_a_icon;
-         recIconB = &default_light_rec_b_icon;
-         prefsIcon = &default_light_prefs_icon;
-         prefsIconActive = &default_light_prefs_toggled_icon;
 @@ -220,25 +220,25 @@ QMap<QString, QString> SonicPiTheme::lightTheme(){
      QMap<QString, QString> themeSettings;
  
@@ -277,7 +249,7 @@ index 76efefb45..5a4fa0611 100644
  
      themeSettings["Base"] = dt_darkgrey;
      themeSettings["AlternateBase"] = dt_grey;
-@@ -474,7 +474,7 @@ QMap<QString, QString> SonicPiTheme::darkTheme(){
+@@ -475,7 +475,7 @@ QMap<QString, QString> SonicPiTheme::darkTheme(){
      themeSettings["MenuSelected"] = dt_pink;
      themeSettings["MenuSelectedText"] = dt_white;
  
@@ -286,7 +258,7 @@ index 76efefb45..5a4fa0611 100644
      themeSettings["Background"]                      = dt_black;
  
      themeSettings["HighlightedForeground"]           = dt_white;
-@@ -492,7 +492,7 @@ QMap<QString, QString> SonicPiTheme::darkTheme(){
+@@ -493,7 +493,7 @@ QMap<QString, QString> SonicPiTheme::darkTheme(){
      themeSettings["DefaultForeground"]               = dt_white;
      themeSettings["DefaultBackground"]               = dt_black;
  
@@ -295,7 +267,7 @@ index 76efefb45..5a4fa0611 100644
      themeSettings["CommentBackground"]               = dt_black;
  
      themeSettings["PODForeground"]                   = dt_white;
-@@ -523,7 +523,7 @@ QMap<QString, QString> SonicPiTheme::darkTheme(){
+@@ -524,7 +524,7 @@ QMap<QString, QString> SonicPiTheme::darkTheme(){
  
      themeSettings["ClassVariableForeground"]         = dt_not_supported;
  
@@ -304,16 +276,7 @@ index 76efefb45..5a4fa0611 100644
      themeSettings["BackticksBackground"]             = dt_gold;
  
      themeSettings["PercentStringxForeground"]        = dt_not_supported;
-@@ -826,7 +826,7 @@ QMap<QString, QString> SonicPiTheme::highContrastTheme(){
- }
- 
- QPalette SonicPiTheme::createPalette() {
--    QPalette p = QApplication::palette(); 
-+    QPalette p = QApplication::palette();
-     p.setColor(QPalette::WindowText,      color("WindowForeground"));
-     p.setColor(QPalette::Window,          color("WindowBackground"));
-     p.setColor(QPalette::Base,            color("Base"));
-@@ -900,7 +900,7 @@ QString SonicPiTheme::getAppStylesheet() {
+@@ -901,7 +901,7 @@ QString SonicPiTheme::getAppStylesheet() {
      QString selectionBackgroundColor = this->color("SelectionBackground").name();
      QString errorBackgroundColor = this->color("ErrorBackground").name();
  
@@ -648,10 +611,10 @@ index 37ae88e33..789610eef 100644
  }
  
 diff --git a/app/gui/qt/widgets/settingswidget.cpp b/app/gui/qt/widgets/settingswidget.cpp
-index bcf14a487..3edac52c9 100644
+index 74ed4acad..eff162448 100644
 --- a/app/gui/qt/widgets/settingswidget.cpp
 +++ b/app/gui/qt/widgets/settingswidget.cpp
-@@ -223,8 +223,8 @@ QGroupBox* SettingsWidget::createIoPrefsTab() {
+@@ -222,8 +222,8 @@ QGroupBox* SettingsWidget::createIoPrefsTab() {
  
      midi_in_ports_label = new QLabel;
      midi_out_ports_label = new QLabel;
@@ -662,25 +625,7 @@ index bcf14a487..3edac52c9 100644
      midi_in_ports_label->setAccessibleName("midi-in-ports-label");
      midi_out_ports_label->setAccessibleName("midi-out-ports-label");
      midi_in_ports_label->setText(tr("No connected input devices"));
-@@ -245,7 +245,7 @@ QGroupBox* SettingsWidget::createIoPrefsTab() {
- 
-     midi_ports_box->setLayout(midi_ports_box_layout);
-     midi_config_box->setLayout(midi_config_box_layout);
--    
-+
-     QGridLayout *io_tab_layout = new QGridLayout();
-     io_tab_layout->addWidget(midi_ports_box, 0, 0, 0, 1);
-     io_tab_layout->addWidget(midi_config_box, 0, 1);
-@@ -288,7 +288,7 @@ QGroupBox* SettingsWidget::createEditorPrefsTab() {
-     show_tabs->setToolTip(tr("Toggle visibility of the buffer selection tabs."));
-     full_screen = new QCheckBox(tr("Full screen"));
-     full_screen->setToolTip(tooltipStrShiftMeta('F', tr("Toggle full screen mode.")));
--   
-+
-     colourModeButtonGroup = new QButtonGroup(this);
-     lightModeCheck = new QCheckBox(tr("Light"));
-     darkModeCheck = new QCheckBox(tr("Dark"));
-@@ -301,7 +301,7 @@ QGroupBox* SettingsWidget::createEditorPrefsTab() {
+@@ -300,7 +300,7 @@ QGroupBox* SettingsWidget::createEditorPrefsTab() {
      colourModeButtonGroup->addButton(darkProModeCheck, 3);
      colourModeButtonGroup->addButton(highContrastModeCheck, 4);
  
@@ -689,34 +634,6 @@ index bcf14a487..3edac52c9 100644
  
      QVBoxLayout *editor_display_box_layout = new QVBoxLayout;
      QVBoxLayout *editor_box_look_feel_layout = new QVBoxLayout;
-@@ -637,12 +637,12 @@ void SettingsWidget::settingsChanged() {
-     clear_output_on_run->setChecked(piSettings->clear_output_on_run);
-     log_cues->setChecked(piSettings->log_cues);
-     log_auto_scroll->setChecked(piSettings->log_auto_scroll);
--    gui_transparency_slider->setValue(piSettings->gui_transparency); 
--    lightModeCheck->setChecked( piSettings->theme == SonicPiTheme::LightMode );        
--    darkModeCheck->setChecked( piSettings->theme == SonicPiTheme::DarkMode );         
--    lightProModeCheck->setChecked( piSettings->theme == SonicPiTheme::LightProMode );     
--    darkProModeCheck->setChecked( piSettings->theme == SonicPiTheme::DarkProMode );      
--    highContrastModeCheck->setChecked( piSettings->theme == SonicPiTheme::HighContrastMode ); 
-+    gui_transparency_slider->setValue(piSettings->gui_transparency);
-+    lightModeCheck->setChecked( piSettings->theme == SonicPiTheme::LightMode );
-+    darkModeCheck->setChecked( piSettings->theme == SonicPiTheme::DarkMode );
-+    lightProModeCheck->setChecked( piSettings->theme == SonicPiTheme::LightProMode );
-+    darkProModeCheck->setChecked( piSettings->theme == SonicPiTheme::DarkProMode );
-+    highContrastModeCheck->setChecked( piSettings->theme == SonicPiTheme::HighContrastMode );
- 
-     show_scopes->setChecked(piSettings->show_scopes);
-     show_scope_axes->setChecked(piSettings->show_scope_axes);
-@@ -700,7 +700,7 @@ void SettingsWidget::connectAll() {
-     connect(darkProModeCheck, SIGNAL(clicked()), this, SLOT(updateColourTheme()));
-     connect(highContrastModeCheck, SIGNAL(clicked()), this, SLOT(updateColourTheme()));
-     connect(gui_transparency_slider, SIGNAL(valueChanged(int)), this, SLOT(updateTransparency(int)));
--    
-+
-     connect(show_scope_axes, SIGNAL(clicked()), this, SLOT(updateSettings()));
-     connect(show_scopes, SIGNAL(clicked()), this, SLOT(updateSettings()));
-     connect(show_scope_axes, SIGNAL(clicked()), this, SLOT(toggleScopeAxes()));
 diff --git a/app/gui/qt/widgets/sonicpilexer.cpp b/app/gui/qt/widgets/sonicpilexer.cpp
 index 5e44742ad..db638d2a3 100644
 --- a/app/gui/qt/widgets/sonicpilexer.cpp
@@ -731,7 +648,7 @@ index 5e44742ad..db638d2a3 100644
  // triggers autocompletion for the next word
  QStringList SonicPiLexer::autoCompletionWordSeparators() const {
 diff --git a/app/gui/qt/widgets/sonicpiscintilla.cpp b/app/gui/qt/widgets/sonicpiscintilla.cpp
-index b2c5ca092..53da3512a 100644
+index b2c5ca092..67b07ee04 100644
 --- a/app/gui/qt/widgets/sonicpiscintilla.cpp
 +++ b/app/gui/qt/widgets/sonicpiscintilla.cpp
 @@ -133,7 +133,7 @@ SonicPiScintilla::SonicPiScintilla(SonicPiLexer *lexer, SonicPiTheme *theme, QSt
@@ -739,7 +656,7 @@ index b2c5ca092..53da3512a 100644
    setMarginsBackgroundColor(theme->color("MarginBackground"));
    setMarginsForegroundColor(theme->color("MarginForeground"));
 -  setMarginsFont(QFont("Hack", 15, -1, true));
-+  setMarginsFont(QFont("Monoid HalfTight", 15, -1, true));
++  setMarginsFont(QFont("Monoid HalfTight", 12, -1, true));
    setUtf8(true);
    setText("# Loading previous buffer contents. Please wait...");
    setLexer((QsciLexer *)lexer);
