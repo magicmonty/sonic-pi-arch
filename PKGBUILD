@@ -4,7 +4,7 @@
 # Contributor: Simon Dreher <code@simon-dreher.de>
 
 pkgname=sonic-pi-git
-pkgver=v3.0.r1121.g1d8e6ca9d
+pkgver=v3.2.r1176.g3538a1840
 pkgrel=1
 pkgdesc="A music-centric programming environment, originally built for the raspberry pi."
 arch=('i686'
@@ -38,7 +38,6 @@ source=('sonic-pi::git+https://github.com/samaaron/sonic-pi.git'
         'sonic-pi-git.desktop'
         'build-ubuntu-app.patch'
         'SonicPi.patch'
-        'sonic-pi-ruby-2.5.patch'
         'lambdaphonic.patch'
         'Monoid-Regular.ttf'
         'Monoid-Italic.ttf')
@@ -48,7 +47,6 @@ md5sums=('SKIP'
          'fd330b2be9b52e9bee2fb9922141e2ca'
          '6317fe781fbad36be19946567fc877e8'
          '18ae5d7db132a68387aba07dcdd10a33'
-         'fb4e8349532628bc4bf5e5237c0169e4'
          '5ea85a2191b9fe2ce9ae92141b3fc46a'
          '7e9c019819d3c84efb61a3abded177aa'
          '3f772e57770d2d3a6850af070a37b194')
@@ -66,7 +64,7 @@ prepare() {
   patch < $srcdir/build-ubuntu-app.patch
   patch < $srcdir/SonicPi.patch
   cd $srcdir/sonic-pi
-  patch -p 1 < ../sonic-pi-ruby-2.5.patch
+  # patch -p 1 < ../sonic-pi-ruby-2.5.patch
   patch -p 1 < ../lambdaphonic.patch
   cp $srcdir/*.ttf $srcdir/sonic-pi/app/gui/qt/fonts/
 }
