@@ -48,7 +48,7 @@ md5sums=('SKIP'
          'fd330b2be9b52e9bee2fb9922141e2ca'
          '99b5694eda50fd61f3db3a973f5db69a'
          '59a905eda37b191b1e3735b12e52d105'
-         '860cf51698b02c630ce787a373855fa8'
+         '13bfb91721d3979074337d23cdcf8355'
          'c65353a6903eab6bc26c8793e13d855a'
          '7e9c019819d3c84efb61a3abded177aa'
          '3f772e57770d2d3a6850af070a37b194')
@@ -66,8 +66,8 @@ prepare() {
   patch < $srcdir/build-ubuntu-app.patch
   patch < $srcdir/SonicPi.patch
   cd $srcdir/sonic-pi
-  patch -p 1 < ../cmake.patch
-  patch -p 1 < ../lambdaphonic.patch
+  patch -p 1 -l < ../cmake.patch
+  patch -p 1 -l < ../lambdaphonic.patch
   cp $srcdir/*.ttf $srcdir/sonic-pi/app/gui/qt/fonts/
 }
 

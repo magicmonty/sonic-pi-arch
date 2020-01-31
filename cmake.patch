@@ -64,3 +64,25 @@ index 9b4f2544d..e719d8d8e 100644
 -add_subdirectory(QScintilla-2.11.4)
 +# add_subdirectory(QScintilla-2.11.4)
  
+diff --git a/app/gui/qt/mainwindow.cpp b/app/gui/qt/mainwindow.cpp
+index 2c02d1713..0d1e20d81 100644
+--- a/app/gui/qt/mainwindow.cpp
++++ b/app/gui/qt/mainwindow.cpp
+@@ -1038,7 +1038,7 @@ QString MainWindow::rootPath() {
+     return QCoreApplication::applicationDirPath() + "/../../../../..";
+ #else
+     // On linux, CMake builds app into the build folder
+-    return QCoreApplication::applicationDirPath() + "/../../../..";
++    return QCoreApplication::applicationDirPath() + "/../../..";
+ #endif
+ }
+ 
+@@ -1658,7 +1658,7 @@ void MainWindow::scope() {
+     scopeAct->setIcon( theme->getScopeIcon(piSettings->show_scopes));
+     if(piSettings->show_scopes)
+     {
+-        for( auto name : scopeInterface->GetScopeCategories()) 
++        for( auto name : scopeInterface->GetScopeCategories())
+         {
+             scopeInterface->EnableScope( name, piSettings->isScopeActive(name));
+         }
