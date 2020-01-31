@@ -83,7 +83,9 @@ build() {
 
 pkgver() {
   cd $srcdir/sonic-pi
-  git describe --long --tags | sed -r 's/([^-]*-g)/r\1/;s/-/./g'
+  postfix=`git describe --long --tags | sed -r 's/([^-]*-g)/r\1/;s/-/./g' | cut -d. -f3-4`
+  prefix=`cat app/gui/qt/mainwindow.cpp | grep ' version = "' | cut -d\" -f2`
+  echo v$prefix.$postfix
 }
 
 package() {
