@@ -38,6 +38,7 @@ source=('sonic-pi::git+https://github.com/samaaron/sonic-pi.git'
         'sonic-pi-git.desktop'
         'build-ubuntu-app.patch'
         'SonicPi.patch'
+        'cmake.patch'
         'lambdaphonic.patch'
         'Monoid-Regular.ttf'
         'Monoid-Italic.ttf')
@@ -45,8 +46,9 @@ md5sums=('SKIP'
          '298e2729cda0c33c9cec7f7f721c1bbd'
          'ba86680be610cc3d6f12d4a89b0f434d'
          'fd330b2be9b52e9bee2fb9922141e2ca'
-         '6317fe781fbad36be19946567fc877e8'
-         '18ae5d7db132a68387aba07dcdd10a33'
+         '99b5694eda50fd61f3db3a973f5db69a'
+         '59a905eda37b191b1e3735b12e52d105'
+         '860cf51698b02c630ce787a373855fa8'
          'c65353a6903eab6bc26c8793e13d855a'
          '7e9c019819d3c84efb61a3abded177aa'
          '3f772e57770d2d3a6850af070a37b194')
@@ -64,6 +66,7 @@ prepare() {
   patch < $srcdir/build-ubuntu-app.patch
   patch < $srcdir/SonicPi.patch
   cd $srcdir/sonic-pi
+  patch -p 1 < ../cmake.patch
   patch -p 1 < ../lambdaphonic.patch
   cp $srcdir/*.ttf $srcdir/sonic-pi/app/gui/qt/fonts/
 }
@@ -135,10 +138,20 @@ package() {
   find $pkgdir -type f -name '.gitkeep' -delete
 
   mv $pkgdir/opt/sonic-pi/app/server/native/linux/* $pkgdir/opt/sonic-pi/app/server/native
+  rm -rf $pkgdir/opt/sonic-pi/install
   rm -rf $pkgdir/opt/sonic-pi/app/server/native/linux
   rm -rf $pkgdir/opt/sonic-pi/app/server/ruby/test
   rm -rf $pkgdir/opt/sonic-pi/app/gui/qt/platform
   rm -rf $pkgdir/opt/sonic-pi/app/gui/qt/wix
+  rm -rf $pkgdir/opt/sonic-pi/app/gui/qt/cmake
+  rm -rf $pkgdir/opt/sonic-pi/app/gui/qt/CMakeFiles
+  rm -rf $pkgdir/opt/sonic-pi/app/gui/qt/external
+  rm -rf $pkgdir/opt/sonic-pi/app/gui/qt/model
+  rm -rf $pkgdir/opt/sonic-pi/app/gui/qt/old
+  rm -rf $pkgdir/opt/sonic-pi/app/gui/qt/osc
+  rm -rf $pkgdir/opt/sonic-pi/app/gui/qt/utils
+  rm -rf $pkgdir/opt/sonic-pi/app/gui/qt/visualizer
+  rm -rf $pkgdir/opt/sonic-pi/app/gui/qt/widgets
   rm -rf $pkgdir/opt/sonic-pi/app/gui/qt/image_source
   rm -rf $pkgdir/opt/sonic-pi/etc/synthdefs/graphviz
   rm -rf $pkgdir/opt/sonic-pi/etc/wavetables
@@ -149,4 +162,7 @@ package() {
   rm $pkgdir/opt/sonic-pi/app/gui/qt/prune*.rb
   rm $pkgdir/opt/sonic-pi/app/gui/qt/rp-*
   rm $pkgdir/opt/sonic-pi/app/gui/qt/SonicPi.rc
+  rm $pkgdir/opt/sonic-pi/app/gui/qt/cmake*.*
+  rm $pkgdir/opt/sonic-pi/app/gui/qt/CMake*.*
+  rm $pkgdir/opt/sonic-pi/app/gui/qt/*.json
 }

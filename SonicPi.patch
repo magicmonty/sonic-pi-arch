@@ -1,21 +1,24 @@
-diff --git a/src/sonic-p/app/gui/qt/SonicPi.pro b/SonicPi.pro
-index a45b446ee..20ca24e57 100644
---- a/src/sonic-pi/app/gui/qt/SonicPi.pro
-+++ b/SonicPi.pro
-@@ -15,6 +15,8 @@ lessThan(QT_MAJOR_VERSION, 5): error("requires Qt 5")
-
+diff --git a/app/gui/qt/SonicPi.pro b/app/gui/qt/SonicPi.pro
+index 42eb10ca4..50c052ee1 100644
+--- a/app/gui/qt/SonicPi.pro
++++ b/app/gui/qt/SonicPi.pro
+@@ -14,15 +14,17 @@
+ lessThan(QT_MAJOR_VERSION, 5): error("requires Qt 5")
+ 
  TARGET = 'sonic-pi'
- CONFIG += qscintilla2 qwt c++11 resources_big
+-CONFIG += qscintilla2 qwt c++11 resources_big
++CONFIG += qscintilla2 qwt c++14 resources_big
 +INCLUDEPATH += /usr/include/qwt
 +LIBS += -l qwt
-
+ 
  QT += core gui concurrent network opengl widgets
-
-@@ -22,7 +24,7 @@ QT += core gui concurrent network opengl widgets
+ 
+ # Linux only
  unix:!macx {
    LIBS += -lrt -lqscintilla2_qt5
-   QMAKE_CXXFLAGS += -std=gnu++11
+-  QMAKE_CXXFLAGS += -std=gnu++11
 -  QMAKE_CXXFLAGS += -Wall -Werror -Wextra -Wno-unused-variable -Wno-unused-parameter
++  QMAKE_CXXFLAGS += -std=gnu++14
 +  QMAKE_CXXFLAGS += -Wall -Wextra -Wno-unused-variable -Wno-unused-parameter
    debug {
      QMAKE_CXXFLAGS += -ggdb
