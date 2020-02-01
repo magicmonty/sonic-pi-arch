@@ -1,37 +1,21 @@
 diff --git a/app/gui/qt/CMakeLists.txt b/app/gui/qt/CMakeLists.txt
-index 669d2204c..6e939ec07 100644
+index b453b74eb..530e329ad 100644
 --- a/app/gui/qt/CMakeLists.txt
 +++ b/app/gui/qt/CMakeLists.txt
-@@ -38,7 +38,7 @@ set(QT_TOOLS_DIR ${CMAKE_PREFIX_PATH}/bin)
+@@ -123,9 +123,9 @@ target_include_directories(${APP_NAME}
  
- set_property(GLOBAL PROPERTY AUTOMOC_FOLDER Automoc)
- set_property(GLOBAL PROPERTY AUTOGEN_TARGETS_FOLDER Automoc)
--find_package(Qt5 COMPONENTS Core Widgets Gui Concurrent Network Opengl PrintSupport Xml Svg REQUIRED)
-+find_package(Qt5 COMPONENTS Core Widgets Gui Concurrent Network OpenGL PrintSupport Xml Svg REQUIRED)
- 
- add_subdirectory(external)
- 
-@@ -77,7 +77,7 @@ set (QT_SOURCES
-     ${APP_ROOT}/widgets/settingswidget.h
-     )
- 
--set(SOURCES 
-+set(SOURCES
-     ${APP_ROOT}/visualizer/scope.cpp
-     ${APP_ROOT}/visualizer/scope.h
-     ${APP_ROOT}/visualizer/scope_buffer.hpp
-@@ -122,8 +122,8 @@ target_include_directories(${APP_NAME}
  target_link_libraries(${APP_NAME}
      PRIVATE
-     QScintilla
+-    QScintilla
 -    Qt5::Core 
 -    Qt5::Gui 
++    qscintilla2_qt5
 +    Qt5::Core
 +    Qt5::Gui
      Qt5::Widgets
      Qt5::OpenGL
      Qt5::Concurrent
-@@ -145,7 +145,7 @@ if(WIN32)
+@@ -154,7 +154,7 @@ if(WIN32)
      add_custom_command(TARGET ${APP_NAME} POST_BUILD
          COMMAND ${CMAKE_COMMAND} -E make_directory ${SONIC_PI_ROOT}/app/server/native/osmid
          COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/external/osmid-prefix/src/osmid-build/Release/m2o.exe ${SONIC_PI_ROOT}/app/server/native/osmid
@@ -40,9 +24,9 @@ index 669d2204c..6e939ec07 100644
  endif() # Win32
  
  # Make convenient source groups in the IDE
-@@ -154,5 +154,5 @@ source_group (Osc FILES ${OSC_SOURCES})
- source_group (Scintilla FILES ${EDITOR_SOURCES})
- source_group (Qt FILES ${QT_SOURCES})
+@@ -163,5 +163,5 @@ source_group(Osc FILES ${OSC_SOURCES})
+ source_group(Scintilla FILES ${EDITOR_SOURCES})
+ source_group(Qt FILES ${QT_SOURCES})
  
 -source_group(Qt\\AutoMoc FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_automoc.cpp ) 
 -source_group(Qt\\AutoMoc REGULAR_EXPRESSION "(mocs_*|qrc_.*|QtAwesome.*)" ) 

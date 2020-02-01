@@ -4,7 +4,7 @@
 # Contributor: Simon Dreher <code@simon-dreher.de>
 
 pkgname=sonic-pi-git
-pkgver=v3.2.0.r1258.gd901d3ba8
+pkgver=v3.2.0.r1261.g10e20c22f
 pkgrel=1
 pkgdesc="A music-centric programming environment, originally built for the raspberry pi."
 arch=('i686'
@@ -36,7 +36,7 @@ source=('sonic-pi::git+https://github.com/samaaron/sonic-pi.git'
 	     'launcher.sh'
         'sonic-pi-git.png'
         'sonic-pi-git.desktop'
-        'build-ubuntu-app.patch'
+        'build-arch-app'
         'SonicPi.patch'
         'cmake.patch'
         'lambdaphonic.patch'
@@ -46,35 +46,27 @@ md5sums=('SKIP'
          '298e2729cda0c33c9cec7f7f721c1bbd'
          'ba86680be610cc3d6f12d4a89b0f434d'
          'fd330b2be9b52e9bee2fb9922141e2ca'
-         '99b5694eda50fd61f3db3a973f5db69a'
+         '7051e0213d99d8934add07d71679d036'
          '59a905eda37b191b1e3735b12e52d105'
-         '13bfb91721d3979074337d23cdcf8355'
+         '3dd4ea879f0a4c597113a4b64dc55424'
          'c65353a6903eab6bc26c8793e13d855a'
          '7e9c019819d3c84efb61a3abded177aa'
          '3f772e57770d2d3a6850af070a37b194')
 
 prepare() {
-  msg2 "Hook up qwt to qmake"
-  qmake -set QMAKEFEATURES usr/lib/qt/mkspecs/features
-
-  #  msg2 "Fix wrongly-named (on Arch) QT library"
-  # find $srcdir/sonic-pi/app/gui/qt -type f -name "*" -readable -exec sed -i 's/lqt5scintilla2/lqscintilla2_qt5/g' {} +
-
-  #Patch build-ubuntu-app script to skip ubuntu-specific (and redundant) options
-  msg2 "Patch build-ubuntu-app script for Arch Linux"
   cd $srcdir/sonic-pi/app/gui/qt
-  patch < $srcdir/build-ubuntu-app.patch
   patch < $srcdir/SonicPi.patch
   cd $srcdir/sonic-pi
   patch -p 1 -l < ../cmake.patch
   patch -p 1 -l < ../lambdaphonic.patch
   cp $srcdir/*.ttf $srcdir/sonic-pi/app/gui/qt/fonts/
+  cp $srcdir/build-arch-app $srcdir/sonic-pi/app/gui/qt
 }
 
 build() {
   #Based on instructions from INSTALL_LINUX.md in upstream sources
   cd $srcdir/sonic-pi/app/gui/qt
-  ./build-ubuntu-app
+  ./build-arch-app
 
   #Cleaning up object files
   cd $srcdir
@@ -137,32 +129,38 @@ package() {
   find $pkgdir -type f -name '*.orig' -delete
   find $pkgdir -type f -name '.gitkeep' -delete
 
-  mv $pkgdir/opt/sonic-pi/app/server/native/linux/* $pkgdir/opt/sonic-pi/app/server/native
-  rm -rf $pkgdir/opt/sonic-pi/install
-  rm -rf $pkgdir/opt/sonic-pi/app/server/native/linux
-  rm -rf $pkgdir/opt/sonic-pi/app/server/ruby/test
-  rm -rf $pkgdir/opt/sonic-pi/app/gui/qt/platform
-  rm -rf $pkgdir/opt/sonic-pi/app/gui/qt/wix
-  rm -rf $pkgdir/opt/sonic-pi/app/gui/qt/cmake
-  rm -rf $pkgdir/opt/sonic-pi/app/gui/qt/CMakeFiles
-  rm -rf $pkgdir/opt/sonic-pi/app/gui/qt/external
-  rm -rf $pkgdir/opt/sonic-pi/app/gui/qt/model
-  rm -rf $pkgdir/opt/sonic-pi/app/gui/qt/old
-  rm -rf $pkgdir/opt/sonic-pi/app/gui/qt/osc
-  rm -rf $pkgdir/opt/sonic-pi/app/gui/qt/utils
-  rm -rf $pkgdir/opt/sonic-pi/app/gui/qt/visualizer
-  rm -rf $pkgdir/opt/sonic-pi/app/gui/qt/widgets
-  rm -rf $pkgdir/opt/sonic-pi/app/gui/qt/image_source
-  rm -rf $pkgdir/opt/sonic-pi/etc/synthdefs/graphviz
-  rm -rf $pkgdir/opt/sonic-pi/etc/wavetables
+  rootdir=$pkgdir/opt/sonic-pi
+  qtdir=$rootdir/app/gui/qt
+  serverdir=$rootdir/app/server
 
-  rm $pkgdir/opt/sonic-pi/app/gui/qt/.qmake.stash
-  rm $pkgdir/opt/sonic-pi/app/gui/qt/create-pdf
-  rm $pkgdir/opt/sonic-pi/app/gui/qt/mac-*
-  rm $pkgdir/opt/sonic-pi/app/gui/qt/prune*.rb
-  rm $pkgdir/opt/sonic-pi/app/gui/qt/rp-*
-  rm $pkgdir/opt/sonic-pi/app/gui/qt/SonicPi.rc
-  rm $pkgdir/opt/sonic-pi/app/gui/qt/cmake*.*
-  rm $pkgdir/opt/sonic-pi/app/gui/qt/CMake*.*
-  rm $pkgdir/opt/sonic-pi/app/gui/qt/*.json
+  rm -rf $rootdir/install
+  rm -rf $serverdir/ruby/test
+  rm -rf $rootdir/etc/synthdefs/graphviz
+  rm -rf $rootdir/etc/wavetables
+
+  rm -rf $qtdir/platform
+  rm -rf $qtdir/wix
+  rm -rf $qtdir/cmake
+  rm -rf $qtdir/CMakeFiles
+  rm -rf $qtdir/external
+  rm -rf $qtdir/model
+  rm -rf $qtdir/old
+  rm -rf $qtdir/osc
+  rm -rf $qtdir/utils
+  rm -rf $qtdir/visualizer
+  rm -rf $qtdir/widgets
+  rm -rf $qtdir/build
+  rm -rf $qtdir/image_source
+
+  rm $serverdir/ruby/bin/compile-extensions.rb
+
+  rm $qtdir/create-pdf
+  rm $qtdir/mac-*
+  rm $qtdir/prune*.rb
+  rm $qtdir/rp-*
+  rm $qtdir/SonicPi.rc
+  rm $qtdir/CMakeLists.txt
+  rm $qtdir/config.sh
+  rm $qtdir/prebuild.sh
+  rm $qtdir/README.md
 }
