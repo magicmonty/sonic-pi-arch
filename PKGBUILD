@@ -4,7 +4,7 @@
 # Contributor: Simon Dreher <code@simon-dreher.de>
 
 pkgname=sonic-pi-git
-pkgver=v3.2.0.r1319.gbbcdba773
+pkgver=v3.2.0.r1330.g070be9422
 pkgrel=1
 pkgdesc="A music-centric programming environment, originally built for the raspberry pi."
 arch=('i686'
