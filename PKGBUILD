@@ -4,7 +4,7 @@
 # Contributor: Simon Dreher <code@simon-dreher.de>
 
 pkgname=sonic-pi-git
-pkgver=v3.2.0.r1330.g070be9422
+pkgver=v3.2.0.2.r91
 pkgrel=1
 pkgdesc="A music-centric programming environment, originally built for the raspberry pi."
 arch=('i686'
@@ -34,58 +34,21 @@ source=('sonic-pi::git+https://github.com/samaaron/sonic-pi.git'
 	     'launcher.sh'
         'sonic-pi-git.png'
         'sonic-pi-git.desktop'
-        'lambdaphonic.patch'
-        'Monoid-Regular.ttf'
-        'Monoid-Italic.ttf')
+        'lambdaphonic.patch')
 md5sums=('SKIP'
          'ce83889f21eff588c69b7c0cb36f8b03'
          'ba86680be610cc3d6f12d4a89b0f434d'
          'fd330b2be9b52e9bee2fb9922141e2ca'
-         'c65353a6903eab6bc26c8793e13d855a'
-         '7e9c019819d3c84efb61a3abded177aa'
-         '3f772e57770d2d3a6850af070a37b194')
-
-prepare() {
-# cd $srcdir/sonic-pi
-#  patch -p 1 -l < ../lambdaphonic.patch
- cp $srcdir/*.ttf $srcdir/sonic-pi/app/gui/qt/fonts/
-}
+         'c65353a6903eab6bc26c8793e13d855a')
+config='Release'
 
 build() {
-  rootdir=$srcdir/sonic-pi
-  rubybin=$rootdir/app/server/ruby/bin
+  cd $srcdir/sonic-pi/app/gui/qt
 
-  echo "Compiling Erlang parts"
-  cd $rootdir/app/server/erlang
-  erlc osc.erl
-  erlc pi_server.erl
-
-  cd $rootdir/app/gui/qt
-  echo "Compiling native ruby extensions"
-  $rubybin/compile-extensions.rb
-  echo "Translating tutorial..."
-  $rubybin/i18n-tool.rb -t
-  echo "Creating QT docs"
-  cp -fn utils/ruby_help.tmpl utils/ruby_help.h || true
-  $rubybin/qt-doc.rb -o utils/ruby_help.h
-  echo "Updating GUI translation files..."
-  lrelease lang/*.ts
-  ./unix-config.sh
+  ./unix-prebuild.sh --build-aubio
+  ./unix-config.sh --config $config
   cd build
-  cmake --build . --config Release
-  mkdir -p ../bin
-  install sonic-pi -t ../bin
-
-  cd ../external/osmid
-  cmake .
-  cmake --build . --config Release
-  mkdir -p $rootdir/app/server/native/osmid
-  install m2o o2m -t $rootdir/app/server/native/osmid/
-
-  #Cleaning up object files
-  cd $srcdir
-  find . -type f -name "*.o" -exec rm {} +
-  find . ! -perm -g+r -exec chmod 666 {} +
+  cmake --build . --config $config
 }
 
 pkgver() {
@@ -97,88 +60,52 @@ pkgver() {
 
 package() {
   #Install sources to /opt/
-  mkdir -p $pkgdir/opt/sonic-pi
-  cp -R $srcdir/sonic-pi/* $pkgdir/opt/sonic-pi/ > /dev/null
-  ln -s -r $pkgdir/opt/sonic-pi/app/server $pkgdir/opt/sonic-pi/server
+  targetRoot=$pkgdir/opt/sonic-pi
+  sourceRoot=$srcdir/sonic-pi
 
-  #Add a launcher script to /usr/bin
-  mkdir -p $pkgdir/usr/bin
-  install -Dm644 "$srcdir/launcher.sh" "$pkgdir/usr/bin/sonic-pi"
-  chmod +x $pkgdir/usr/bin/sonic-pi
+  mkdir -p $targetRoot
+  cd $targetRoot
+
+  mkdir -p app
+  cp -R $sourceRoot/app/server app/server
+  mkdir -p app/server/native/ruby/bin
+  ln -s /usr/bin/ruby app/server/native/ruby/bin
+  ln -s app/server .
+  rm app/server/ruby/bin/compile-extensions.rb
+  rm app/server/erlang/print_erlang_version
+
+  cp -R $sourceRoot/etc .
+  rm -rf etc/synthdefs/graphviz
+  rm -rf etc/wavetables
+
+  mkdir -p app/gui/qt
+  cp -R $sourceRoot/app/gui/qt/theme app/gui/qt/
+  echo "QWidget { background-color: paneColor; }" >> app/gui/qt/theme/app.qss
+
+  cat $sourceRoot/app/gui/qt/prune.rb | sed 's/rehearse = true/rehearse = false/' > $sourceRoot/app/gui/qt/prune_hot.rb
+  chmod 0755 $sourceRoot/app/gui/qt/prune_hot.rb
+  $sourceRoot/app/gui/qt/prune_hot.rb app/server/ruby/vendor
+  rm $sourceRoot/app/gui/qt/prune_hot.rb
+
+  mkdir -p app/gui/qt/bin
+  install -Dm755 $sourceRoot/app/gui/qt/build/sonic-pi app/gui/qt/bin/
+
+  # Add a launcher script to /usr/bin
+  cd $pkgdir
+  mkdir -p usr/bin
+  install -Dm755 $srcdir/launcher.sh usr/bin/sonic-pi
 
   #Add a desktop entry
-  mkdir -p $pkgdir/usr/share/applications
-  install -Dm644 "$pkgname.desktop" "$pkgdir/usr/share/applications/$pkgname.desktop"
-  mkdir -p $pkgdir/usr/share/pixmaps
-  install -Dm644 "sonic-pi-git.png" "$pkgdir/usr/share/pixmaps/$pkgname.png"
+  mkdir -p usr/share/applications
+  install -Dm644 $srcdir/$pkgname.desktop usr/share/applications/$pkgname.desktop
+  mkdir -p usr/share/pixmaps
+  install -Dm644 $srcdir/$pkgname.png usr/share/pixmaps/$pkgname.png
 
-  cd $srcdir/sonic-pi/app/gui/qt
-  cat prune.rb | sed 's/rehearse = true/rehearse = false/' > prune_hot.rb
-  chmod 0755 prune_hot.rb
-  ./prune_hot.rb $pkgdir/opt/sonic-pi/app/server/ruby/vendor
-
-  rm $pkgdir/opt/sonic-pi/CORETEAM.html
-
-  cd $pkgdir
-  find $pkgdir -type f -iname '*.cpp' -delete
-  find $pkgdir -type f -iname '*.erl' -delete
-  find $pkgdir -type f -iname '*.hpp' -delete
-  find $pkgdir -type f -iname '*.c' -delete
-  find $pkgdir -type f -iname '*.h' -delete
-  find $pkgdir -type f -iname '*.hh' -delete
-  find $pkgdir -type f -iname '*.o' -delete
-  find $pkgdir -type f -iname '*.patch' -delete
-  find $pkgdir -type f -iname 'build-*' -delete
-  find $pkgdir -type f -iname '*.pro' -delete
-  find $pkgdir -type f -iname '*.qrc' -delete
-  find $pkgdir -type f -iname '*.bat' -delete
-  find $pkgdir -type f -iname '*.tmpl' -delete
-  find $pkgdir -type f -iname 'Makefile' -delete
-  find $pkgdir -type f -iname 'Rakefile' -delete
-  find $pkgdir -type f -iname 'Brewfile*' -delete
-  find $pkgdir -type d -name 'test' -exec rm -rf {} +
-  find $pkgdir -type d -name 'tests' -exec rm -rf {} +
-  find $pkgdir -type f -name 'INSTALL-*.md' -delete
-  find $pkgdir -type f -name '*.orig' -delete
-  find $pkgdir -type f -name '.gitkeep' -delete
-
-  rootdir=$pkgdir/opt/sonic-pi
-  qtdir=$rootdir/app/gui/qt
-  serverdir=$rootdir/app/server
-
-  rm -rf $rootdir/install
-  rm -rf $rootdir/prebuilt
-  rm -rf $serverdir/ruby/test
-  rm -rf $rootdir/etc/synthdefs/graphviz
-  rm -rf $rootdir/etc/wavetables
-
-  rm -rf $qtdir/platform
-  rm -rf $qtdir/wix
-  rm -rf $qtdir/cmake
-  rm -rf $qtdir/CMakeFiles
-  rm -rf $qtdir/external
-  rm -rf $qtdir/model
-  rm -rf $qtdir/old
-  rm -rf $qtdir/osc
-  rm -rf $qtdir/utils
-  rm -rf $qtdir/visualizer
-  rm -rf $qtdir/widgets
-  rm -rf $qtdir/build
-  rm -rf $qtdir/image_source
-
-  rm $serverdir/ruby/bin/compile-extensions.rb
-  rm $serverdir/erlang/print_erlang_version
-
-  rm $qtdir/mac-*
-  rm $qtdir/prune*.rb
-  rm $qtdir/rp-*
-  rm $qtdir/SonicPi.rc
-  rm $qtdir/CMakeLists.txt
-  rm $qtdir/unix-config.sh
-  rm $qtdir/unix-prebuild.sh
-  rm $qtdir/util-create-pdf
-  rm $qtdir/README.md
-
-  mkdir -p $serverdir/native/ruby/bin
-  ln -s /usr/bin/ruby $serverdir/native/ruby/bin
+  find . -type f -iname '*.erl' -delete
+  find . -type f -iname '*.c' -delete
+  find . -type f -iname '*.h' -delete
+  find . -type f -iname 'Rakefile' -delete
+  find . -type d -name 'test' -exec rm -rf {} +
+  find . -type d -name 'tests' -exec rm -rf {} +
+  find . -type f -name '.gitkeep' -delete
 }
