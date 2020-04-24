@@ -33,13 +33,11 @@ optdepends=('qjackctl: for graphical jackd spawning/configuration'
 source=('sonic-pi::git+https://github.com/samaaron/sonic-pi.git'
 	     'launcher.sh'
         'sonic-pi-git.png'
-        'sonic-pi-git.desktop'
-        'lambdaphonic.patch')
+        'sonic-pi-git.desktop')
 md5sums=('SKIP'
          'ce83889f21eff588c69b7c0cb36f8b03'
          'ba86680be610cc3d6f12d4a89b0f434d'
-         'fd330b2be9b52e9bee2fb9922141e2ca'
-         'c65353a6903eab6bc26c8793e13d855a')
+         'fd330b2be9b52e9bee2fb9922141e2ca')
 config='Release'
 
 build() {
