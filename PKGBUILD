@@ -5,7 +5,7 @@
 
 _name=sonic-pi
 pkgname=sonic-pi-git
-pkgver=v3.2.0.2.r91
+pkgver=v3.2.0.2.r190
 pkgrel=1
 pkgdesc="The Live Coding Music Synth for Everyone"
 arch=('i686' 'x86_64')
