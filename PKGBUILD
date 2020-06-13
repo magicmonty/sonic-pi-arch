@@ -5,7 +5,7 @@
 
 _name=sonic-pi
 pkgname=sonic-pi-git
-pkgver=v3.2.0.2.r190
+pkgver=v3.2.0.2.r235
 pkgrel=1
 pkgdesc="The Live Coding Music Synth for Everyone"
 arch=('i686' 'x86_64')
@@ -60,8 +60,12 @@ prepare() {
 build() {
   cd "${srcdir}/${_name}/app/gui/qt"
 
-./unix-prebuild.sh
-  ./unix-config.sh --config $config
+  chmod +x ./linux-prebuild.sh
+  chmod +x ./linux-config.sh
+
+  export CPATH=/usr/lib/erlang/usr/include
+  ./linux-prebuild.sh
+  ./linux-config.sh --config $config
   cd build
   cmake --build . --config $config
 }
@@ -83,9 +87,11 @@ package() {
   ln -s app/server .
   rm app/server/ruby/bin/compile-extensions.rb
   rm app/server/erlang/print_erlang_version
-  rm app/server/erlang/*.app
   rm app/server/erlang/*.md
-  chmod 0755 app/server/erlang/*.beam
+  rm -rf app/server/erlang/sonic_pi_server/priv
+  rm -rf app/server/erlang/sonic_pi_server/src
+  rm -rf app/server/erlang/sonic_pi_server/Emakefile
+  chmod +x app/server/erlang/sonic_pi_server/ebin/*.beam
 
   mkdir -p ${qttgt}
 
